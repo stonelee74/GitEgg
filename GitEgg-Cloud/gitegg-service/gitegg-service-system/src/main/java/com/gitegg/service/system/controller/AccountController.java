@@ -262,4 +262,10 @@ public class AccountController {
         }
         return smsResult;
     }
+
+    public static void main(String[] args) {
+        PasswordEncoder passwordEncoder = PasswordEncoderFactories.createDelegatingPasswordEncoder();
+        String cryptPwd = passwordEncoder.encode(AuthConstant.BCRYPT + "admin" + DigestUtils.md5DigestAsHex("admin".getBytes()));
+        System.out.println(cryptPwd);
+    }
 }
