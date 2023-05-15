@@ -24,9 +24,9 @@
           </a-col>
           <a-col :md="6"
                  :sm="24">
-            <a-form-model-item label="角色标识">
+            <a-form-model-item label="角色代码">
               <a-input v-model.trim="listQuery.roleKey"
-                       placeholder="角色标识"
+                       placeholder="角色代码"
                        :max-length="100"
                        @keyup.enter.native="handleFilter" />
             </a-form-model-item>
@@ -165,10 +165,10 @@
                    placeholder="输入角色名称"
                    :maxLength="32" />
         </a-form-model-item>
-        <a-form-model-item label="角色标识"
+        <a-form-model-item label="角色代码"
                            prop="roleKey">
           <a-input v-model="roleForm.roleKey"
-                   placeholder="输入角色标识"
+                   placeholder="输入角色代码"
                    :maxLength="32" />
         </a-form-model-item>
         <a-form-model-item label="角色级别"
@@ -310,7 +310,7 @@ export default {
       }
       checkRoleExist(keyData).then(response => {
         if (!response.data) {
-          callback(new Error('角色标识已存在'))
+          callback(new Error('角色代码已存在'))
         } else {
           callback()
         }
@@ -378,7 +378,7 @@ export default {
           dataIndex: 'roleName'
         },
         {
-          title: '角色标识',
+          title: '角色代码',
           align: 'center',
           dataIndex: 'roleKey'
         },
@@ -425,7 +425,7 @@ export default {
           { validator: validRoleName, trigger: 'blur' }
         ],
         roleKey: [
-          { required: true, message: '请输入角色标识', trigger: 'blur' },
+          { required: true, message: '请输入角色代码', trigger: 'blur' },
           { min: 2, max: 16, message: '长度在 2 到 16 个字符', trigger: 'blur' },
           { validator: validRoleKey, trigger: 'blur' }
         ],
@@ -733,7 +733,7 @@ export default {
         const tHeader = [
           '序号',
           '角色名称',
-          '角色标识',
+          '角色代码',
           '角色级别',
           '创建时间',
           '角色状态'

@@ -135,3 +135,10 @@ export function handleDownloadBlod (fileName, response) {
     exportBlod(fileName, res)
   }
 }
+
+// 处理对象复制
+export function copyObject (source, dest) {
+  for (var item in dest) {
+    dest[item] = typeof source[item] === 'object' ? copyObject(source[item], dest[item]) : source[item]
+  }
+}

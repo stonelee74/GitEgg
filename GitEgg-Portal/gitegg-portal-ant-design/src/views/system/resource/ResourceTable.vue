@@ -1,6 +1,7 @@
 <template>
   <a-card :bordered="false"
-          class="content">
+          class="content"
+          style="padding: 10px">
     <div class="table-page-search-wrapper">
       <a-form-model layout="inline">
         <a-row :gutter="48">

@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div style="padding: 10px">
     <a-row :gutter="24">
       <a-col :sm="24" :md="12" :xl="6" :style="{ marginBottom: '24px' }">
         <chart-card :loading="loading" :title="$t('dashboard.analysis.total-sales')" total="￥126,560">

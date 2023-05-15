@@ -1,5 +1,5 @@
 <template>
-  <div style="">
+  <div class="content">
     <a-row :gutter="10">
       <a-col :span="5">
         <a-card :bordered="false">

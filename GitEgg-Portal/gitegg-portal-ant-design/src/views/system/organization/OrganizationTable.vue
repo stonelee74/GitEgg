@@ -1,6 +1,7 @@
 <template>
   <a-card :bordered="false"
-          class="content">
+          class="content"
+          style="padding: 10px">
     <div class="table-page-search-wrapper">
       <a-form-model layout="inline">
         <a-row :gutter="48">
@@ -15,9 +16,9 @@
           </a-col>
           <a-col :md="6"
                  :sm="24">
-            <a-form-model-item label="组织标识">
+            <a-form-model-item label="组织代码">
               <a-input v-model.trim="treeQuery.organizationKey"
-                       placeholder="请输入组织标识"
+                       placeholder="请输入组织代码"
                        :max-length="32"
                        @keyup.enter.native="searchTreeData" />
             </a-form-model-item>
@@ -44,7 +45,8 @@
 
     <a-table :columns="columns"
              :rowKey="row=>row.id"
-             :data-source="list">
+             :data-source="list"
+             bordered>
       <span slot="organizationType"
             slot-scope="text, record">
         <span>{{ record.organizationType | typeNameFilter }}</span>
@@ -109,10 +111,10 @@
             </a-form-model-item>
           </a-col>
           <a-col :span="12">
-            <a-form-model-item label="组织标识"
+            <a-form-model-item label="组织代码"
                                prop="organizationKey">
               <a-input v-model.trim="organizationForm.organizationKey"
-                       placeholder="输入组织标识"
+                       placeholder="输入组织代码"
                        :maxLength="32" />
             </a-form-model-item>
           </a-col>
@@ -183,6 +185,7 @@
 import { STable } from '@/components'
 import { fetchOrgList, createOrganization, deleteOrganization, updateOrganization, checkOrganizationExist } from '@/api/system/organization'
 import Data from '@/api/pcaa'
+import { copyObject } from '@/utils/util'
 
 export default {
   name: 'OrganizationTable',
@@ -221,7 +224,7 @@ export default {
       }
       checkOrganizationExist(keyData).then(response => {
         if (!response.data) {
-          callback(new Error('组织标识已存在'))
+          callback(new Error('组织代码已存在'))
         } else {
           callback()
         }
@@ -293,7 +296,7 @@ export default {
           dataIndex: 'organizationName'
         },
         {
-          title: '组织标识',
+          title: '组织代码',
           align: 'center',
           dataIndex: 'organizationKey'
         },
@@ -316,7 +319,7 @@ export default {
         {
           title: '操作',
           dataIndex: 'action',
-          width: '150px',
+          width: '160px',
           scopedSlots: { customRender: 'action' }
         }
       ],
@@ -327,7 +330,7 @@ export default {
           { validator: validOrganizationName, trigger: 'blur' }
         ],
         organizationKey: [
-          { required: true, message: '请输入组织标识', trigger: 'blur' },
+          { required: true, message: '请输入组织代码', trigger: 'blur' },
           { min: 2, max: 32, message: '长度在 2 到 32 个字符', trigger: 'blur' },
           { validator: validOrganizationKey, trigger: 'blur' }
         ],
@@ -447,16 +450,19 @@ export default {
         }
       })
     },
+    // deepClone (source, dest) {
+    //   for (var item in dest) {
+    //     dest[item] = typeof source[item] === 'object' ? this.deepClone(source[item], dest[item]) : source[item]
+    //   }
+    // },
     handleUpdate (row) {
       this.resetOrganizationForm()
-      this.organizationForm = Object.assign({}, row) // copy obj
-      if (!this.organizationForm.areas || this.organizationForm.areas.length === 0) {
-        this.organizationForm.areas = [
-          this.organizationForm.province,
-          this.organizationForm.city,
-          this.organizationForm.area
-        ]
-      }
+      copyObject(row, this.organizationForm)
+      this.organizationForm.areas = [
+         row.province,
+         row.city,
+         row.area
+     ]
 
      if (this.organizationForm.parentId && this.organizationForm.parentId !== '0') {
         var orgStr = this.selectOrgListByLastId(this.orgList, this.organizationForm.parentId) + ''
@@ -638,3 +644,9 @@ export default {
   }
 }
 </script>
+<style scoped>
+  ::v-deep .ant-table-thead > tr > th {
+    background: lightgray;
+    font-weight: bold;
+  }
+</style>

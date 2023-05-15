@@ -6,7 +6,7 @@
       <a href="https://github.com/wmz1930" target="_blank">@GitEgg</a>
     </template>
     <template v-slot:copyright>
-      <a href="https://cloud.gitegg.com" target="_blank">GitEgg</a>
+      <a href="https://www.yuntucredit.com" target="_blank">微数科技</a>
     </template>
   </global-footer>
 </template>
