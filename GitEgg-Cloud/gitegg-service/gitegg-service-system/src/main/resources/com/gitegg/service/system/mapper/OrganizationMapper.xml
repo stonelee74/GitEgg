@@ -64,7 +64,7 @@
                 </otherwise>
             </choose>
         </if>
-        ORDER BY org.id desc
+        ORDER BY org.organization_level asc
     </select>
 
     <!-- 级联查询树 -->
@@ -91,7 +91,7 @@
         <if test="org.parentId != null">
             AND org.parent_id = #{org.parentId}
         </if>
-        ORDER BY org.id desc
+        ORDER BY org.organization_level asc
     </select>
 
 </mapper>
