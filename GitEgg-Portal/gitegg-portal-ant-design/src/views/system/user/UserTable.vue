@@ -33,9 +33,9 @@
                 </a-col>
                 <a-col :md="6"
                        :sm="24">
-                  <a-form-model-item label="用户角色">
+                  <a-form-model-item label="用户岗位">
                     <a-select v-model="listQuery.roleId"
-                              placeholder="用户角色"
+                              placeholder="用户岗位"
                               allow-clear
                               show-search
                               :filter-option="filterOption">
@@ -92,47 +92,47 @@
                     </a-form-model-item>
                   </a-col>
                 </template>
-                <a-col :md="!advanced && 6 || 24"
-                       :sm="24">
-                  <span class="table-page-search-submitButtons"
-                        :style="advanced && { float: 'right', overflow: 'hidden' } || {} ">
-                    <a-button type="primary"
-                              @click="handleFilter"
-                              v-hasAnyPerms="['system:user:list']">查询</a-button>
-                    <a-button style="margin-left: 8px"
-                              @click="resetListQuery">重置</a-button>
-                    <a @click="toggleAdvanced"
-                       style="margin-left: 8px">
-                      {{ advanced ? '收起' : '展开' }}
-                      <a-icon :type="advanced ? 'up' : 'down'" />
-                    </a>
-                  </span>
-                </a-col>
               </a-row>
             </a-form-model>
           </div>
 
           <div class="table-operator">
-            <a-button type="primary"
-                      icon="plus"
-                      @click="handleCreate"
-                      v-hasAnyPerms="['system:user:create']">新建</a-button>
-            <a-button type="primary"
-                      icon="cloud-download"
-                      @click="handleDownload"
-                      style="margin-left: 8px">导出</a-button>
-            <a-dropdown v-if="selectedRowKeys.length > 0" v-hasAnyPerms="['system:user:delete', 'system:user:batch:delete']">
-              <a-menu slot="overlay">
-                <a-menu-item key="1"
-                             @click="handleBatchDelete">
-                  <a-icon type="delete" />删除
-                </a-menu-item>
-              </a-menu>
-              <a-button style="margin-left: 8px">
-                批量操作
-                <a-icon type="down" />
-              </a-button>
-            </a-dropdown>
+            <a-row>
+              <a-col :span="12">
+                <a-dropdown v-if="selectedRowKeys.length > 0" v-hasAnyPerms="['system:user:delete', 'system:user:batch:delete']">
+                  <a-menu slot="overlay">
+                    <a-menu-item key="1" @click="handleBatchDelete">
+                      <a-icon type="delete" />删除
+                    </a-menu-item>
+                  </a-menu>
+                  <a-button style="margin-left: 8px">
+                    批量操作
+                    <a-icon type="down" />
+                  </a-button>
+                </a-dropdown>
+                <a-button type="primary"
+                          icon="plus"
+                          @click="handleCreate"
+                          v-hasAnyPerms="['system:user:create']">添加新员工</a-button>
+                <a-button type="primary"
+                          icon="plus"
+                          @click="handleCreate"
+                          v-hasAnyPerms="['system:user:create']">添加现有员工</a-button>
+                <a-button type="primary"
+                          icon="cloud-download"
+                          @click="handleDownload"
+                          style="margin-left: 8px">导出</a-button>
+              </a-col>
+              <a-col :span="12" style="text-align: right">
+                <a-button @click="toggleAdvanced">{{ advanced ? '收起' : '更多查询条件' }}</a-button>
+                <a-button type="primary"
+                          style="margin-left: 8px"
+                          @click="handleFilter"
+                          v-hasAnyPerms="['system:user:list']">查询</a-button>
+                <a-button style="margin-left: 8px"
+                          @click="resetListQuery">重置</a-button>
+              </a-col>
+            </a-row>
           </div>
 
           <s-table ref="userTable"
@@ -200,10 +200,11 @@
 
           <a-drawer :title="textMap[dialogStatus]"
                     :maskClosable="false"
+                    :closable="true"
                     :visible="dialogFormVisible"
                     placement="right"
                     :width="700"
-                    @cancel="() => dialogFormVisible = false">
+                    @close="() => dialogFormVisible = false">
             <a-form-model ref="userForm"
                           :model="userForm"
                           :rules="rules"
@@ -249,10 +250,10 @@
                          placeholder="输入用户电子邮箱"
                          :max-length="32" />
               </a-form-model-item>
-              <a-form-model-item label="用户角色"
+              <a-form-model-item label="用户岗位"
                                  prop="roleId">
                 <a-select v-model="userForm.roleIds"
-                          placeholder="选择用户角色"
+                          placeholder="选择用户岗位"
                           allow-clear
                           show-search
                           :filter-option="filterOption"
@@ -513,7 +514,24 @@ export default {
           title: '序号',
           align: 'center',
           width: 80,
-          dataIndex: 'id'
+          dataIndex: 'id',
+          fixed: 'left'
+        },
+        {
+          title: '账号',
+          align: 'center',
+          width: 100,
+          ellipsis: true,
+          dataIndex: 'account',
+          fixed: 'left'
+        },
+        {
+          title: '姓名',
+          align: 'center',
+          width: 100,
+          ellipsis: true,
+          dataIndex: 'realName',
+          fixed: 'left'
         },
         {
           title: '组织机构',
@@ -521,20 +539,6 @@ export default {
           ellipsis: true,
           width: 200,
           dataIndex: 'organizationName'
-        },
-        {
-          title: '账号',
-          align: 'center',
-          width: 100,
-          ellipsis: true,
-          dataIndex: 'account'
-        },
-        {
-          title: '姓名',
-          align: 'center',
-          width: 100,
-          ellipsis: true,
-          dataIndex: 'realName'
         },
         {
           title: '手机号',
@@ -551,7 +555,7 @@ export default {
           dataIndex: 'email'
         },
         {
-          title: '角色',
+          title: '岗位',
           align: 'center',
           width: 150,
           ellipsis: true,
@@ -628,7 +632,7 @@ export default {
           { validator: validemail, trigger: 'blur' }
         ],
         roleIds: [
-          { required: true, message: '请选择用户角色', trigger: 'change' }
+          { required: true, message: '请选择用户岗位', trigger: 'change' }
         ],
         organizationId: [
           { required: true, message: '请选择组织机构', trigger: 'change' }
@@ -1001,7 +1005,7 @@ export default {
           '姓名',
           '手机号',
           '邮箱',
-          '角色',
+          '岗位',
           '性别',
           '注册时间',
           '状态'

@@ -4,7 +4,7 @@
       <a-form layout="inline">
         <a-row :gutter="48">
           <a-col :md="8" :sm="24">
-            <a-form-item label="角色ID">
+            <a-form-item label="岗位ID">
               <a-input placeholder="请输入"/>
             </a-form-item>
           </a-col>
@@ -90,7 +90,7 @@ export default {
   },
   data () {
     return {
-      description: '列表使用场景：后台管理中的权限管理以及角色管理，可用于基于 RBAC 设计的角色权限控制，颗粒度细到每一个操作类型。',
+      description: '列表使用场景：后台管理中的权限管理以及岗位管理，可用于基于 RBAC 设计的岗位权限控制，颗粒度细到每一个操作类型。',
 
       visible: false,
 
@@ -108,7 +108,7 @@ export default {
           dataIndex: 'id'
         },
         {
-          title: '角色名称',
+          title: '岗位名称',
           dataIndex: 'name'
         },
         {

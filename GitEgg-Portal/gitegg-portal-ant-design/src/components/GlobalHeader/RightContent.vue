@@ -1,7 +1,9 @@
 <template>
   <div :class="wrpCls">
     <avatar-dropdown :menu="showMenu" :current-user="currentUser" :class="prefixCls" />
+    <!-- 关闭多语言选择
     <select-lang :class="prefixCls" />
+    -->
   </div>
 </template>
 

@@ -89,7 +89,7 @@
       <a-card type="inner" title="多层信息组">
         <a-descriptions title="组名称" size="small">
           <a-descriptions-item label="负责人">林东东</a-descriptions-item>
-          <a-descriptions-item label="角色码">1234567</a-descriptions-item>
+          <a-descriptions-item label="岗位码">1234567</a-descriptions-item>
           <a-descriptions-item label="所属部门">XX公司-YY部</a-descriptions-item>
           <a-descriptions-item label="过期时间">2018-08-08</a-descriptions-item>
           <a-descriptions-item label="描述">这段描述很长很长很长很长很长很长很长很长很长很长很长很长很长很长...</a-descriptions-item>
@@ -101,7 +101,7 @@
         <a-divider style="margin: 16px 0" />
         <a-descriptions title="组名称" size="small" :col="2">
           <a-descriptions-item label="负责人">付小小</a-descriptions-item>
-          <a-descriptions-item label="角色码">1234567</a-descriptions-item>
+          <a-descriptions-item label="岗位码">1234567</a-descriptions-item>
         </a-descriptions>
       </a-card>
 

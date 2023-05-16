@@ -15,18 +15,18 @@
           </a-col>
           <a-col :md="6"
                  :sm="24">
-            <a-form-model-item label="角色名称">
+            <a-form-model-item label="岗位名称">
               <a-input v-model.trim="listQuery.roleName"
-                       placeholder="角色名称"
+                       placeholder="岗位名称"
                        :max-length="11"
                        @keyup.enter.native="handleFilter" />
             </a-form-model-item>
           </a-col>
           <a-col :md="6"
                  :sm="24">
-            <a-form-model-item label="角色代码">
+            <a-form-model-item label="岗位代码">
               <a-input v-model.trim="listQuery.roleKey"
-                       placeholder="角色代码"
+                       placeholder="岗位代码"
                        :max-length="100"
                        @keyup.enter.native="handleFilter" />
             </a-form-model-item>
@@ -34,9 +34,9 @@
           <template v-if="advanced">
             <a-col :md="6"
                    :sm="24">
-              <a-form-model-item label="角色状态">
+              <a-form-model-item label="岗位状态">
                 <a-select v-model="listQuery.roleStatus"
-                          placeholder="角色状态"
+                          placeholder="岗位状态"
                           allow-clear
                           show-search
                           :filter-option="filterOption">
@@ -159,25 +159,25 @@
                     :rules="rules"
                     :label-col="roleLabelCol"
                     :wrapper-col="roleWrapperCol">
-        <a-form-model-item label="角色名称"
+        <a-form-model-item label="岗位名称"
                            prop="roleName">
           <a-input v-model="roleForm.roleName"
-                   placeholder="输入角色名称"
+                   placeholder="输入岗位名称"
                    :maxLength="32" />
         </a-form-model-item>
-        <a-form-model-item label="角色代码"
+        <a-form-model-item label="岗位代码"
                            prop="roleKey">
           <a-input v-model="roleForm.roleKey"
-                   placeholder="输入角色代码"
+                   placeholder="输入岗位代码"
                    :maxLength="32" />
         </a-form-model-item>
-        <a-form-model-item label="角色级别"
+        <a-form-model-item label="岗位级别"
                            prop="roleLevel">
           <a-input v-model="roleForm.roleLevel"
-                   placeholder="输入角色级别"
+                   placeholder="输入岗位级别"
                    :maxLength="5" />
         </a-form-model-item>
-        <a-form-model-item label="角色状态"
+        <a-form-model-item label="岗位状态"
                            prop="roleStatus">
           <a-radio-group v-model="roleForm.roleStatus"
                          name="roleStatus">
@@ -296,7 +296,7 @@ export default {
       }
       checkRoleExist(keyData).then(response => {
         if (!response.data) {
-          callback(new Error('角色名称已存在'))
+          callback(new Error('岗位名称已存在'))
         } else {
           callback()
         }
@@ -310,7 +310,7 @@ export default {
       }
       checkRoleExist(keyData).then(response => {
         if (!response.data) {
-          callback(new Error('角色代码已存在'))
+          callback(new Error('岗位代码已存在'))
         } else {
           callback()
         }
@@ -355,7 +355,7 @@ export default {
         create: '添加'
       },
       dialogPvVisible: false,
-      drawerTitle: '配置角色资源',
+      drawerTitle: '配置岗位资源',
       roleForm: {
         id: '',
         roleName: '',
@@ -373,17 +373,17 @@ export default {
           dataIndex: 'id'
         },
         {
-          title: '角色名称',
+          title: '岗位名称',
           align: 'center',
           dataIndex: 'roleName'
         },
         {
-          title: '角色代码',
+          title: '岗位代码',
           align: 'center',
           dataIndex: 'roleKey'
         },
         {
-          title: '角色级别',
+          title: '岗位级别',
           align: 'center',
           dataIndex: 'roleLevel'
         },
@@ -420,17 +420,17 @@ export default {
       ],
       rules: {
         roleName: [
-          { required: true, message: '请输入角色名称', trigger: 'blur' },
+          { required: true, message: '请输入岗位名称', trigger: 'blur' },
           { min: 2, max: 16, message: '长度在 2 到 16 个字符', trigger: 'blur' },
           { validator: validRoleName, trigger: 'blur' }
         ],
         roleKey: [
-          { required: true, message: '请输入角色代码', trigger: 'blur' },
+          { required: true, message: '请输入岗位代码', trigger: 'blur' },
           { min: 2, max: 16, message: '长度在 2 到 16 个字符', trigger: 'blur' },
           { validator: validRoleKey, trigger: 'blur' }
         ],
         roleStatus: [
-          { required: true, message: '请选择角色状态', trigger: 'change' }
+          { required: true, message: '请选择岗位状态', trigger: 'change' }
         ],
         dataPermissionType: [
           { required: true, message: '请选择数据权限', trigger: 'change' }
@@ -589,7 +589,7 @@ export default {
     handleDelete (row) {
       var that = this
       this.$confirm({
-        title: '此操作将永久删除该角色：' + row.roleName + ', 是否继续?',
+        title: '此操作将永久删除该岗位：' + row.roleName + ', 是否继续?',
         content: '',
         onOk () {
           that.listLoading = true
@@ -610,7 +610,7 @@ export default {
       })
       var that = this
       this.$confirm({
-        title: '以下角色将被全部删除，是否继续?',
+        title: '以下岗位将被全部删除，是否继续?',
         content: roleList.join(','),
         onOk () {
           that.listLoading = true
@@ -637,7 +637,7 @@ export default {
     },
     handleUpdateResource (row) {
       var that = this
-      this.drawerTitle = '配置角色 [' + row.roleName + '] 资源'
+      this.drawerTitle = '配置岗位 [' + row.roleName + '] 资源'
       this.currentRole = row.id
       this.resourceTreeCheckedKeys = []
       this.resourceTree = []
@@ -724,7 +724,7 @@ export default {
         this.$loading.hide()
         this.dialogResourceVisible = false
         this.listLoading = false
-        this.$message.success('角色资源修改成功')
+        this.$message.success('岗位资源修改成功')
       })
     },
     handleDownload () {
@@ -732,11 +732,11 @@ export default {
       import('@/vendor/Export2Excel').then(excel => {
         const tHeader = [
           '序号',
-          '角色名称',
-          '角色代码',
-          '角色级别',
+          '岗位名称',
+          '岗位代码',
+          '岗位级别',
           '创建时间',
-          '角色状态'
+          '岗位状态'
         ]
         const filterVal = [
           'id',
@@ -750,7 +750,7 @@ export default {
         excel.export_json_to_excel({
           header: tHeader,
           data,
-          filename: '角色列表'
+          filename: '岗位列表'
         })
         this.downloadLoading = false
       })

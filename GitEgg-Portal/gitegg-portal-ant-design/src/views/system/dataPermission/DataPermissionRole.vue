@@ -138,7 +138,7 @@
               <a @click="handleUpdate(record)">编辑</a>
               <a-divider type="vertical" />
               <a href="javascript:;"
-                 @click="queryDataPermissionRole(record)">角色关联</a>
+                 @click="queryDataPermissionRole(record)">岗位关联</a>
               <a-divider type="vertical" />
               <a-dropdown>
                 <a class="ant-dropdown-link">
@@ -375,7 +375,7 @@ export default {
       leftSelectedKeys: [],
       dialogFormVisible: false,
       dialogDataPermissionVisible: false,
-      drawerTitle: '设置拥有数据权限的角色',
+      drawerTitle: '设置拥有数据权限的岗位',
       checkStrictly: true,
       checkable: true,
       dialogStatus: '',
@@ -531,7 +531,7 @@ export default {
       listRoleQuery: {
         id: ''
       },
-      // 角色表头
+      // 岗位表头
       roleColumns: [
         {
           title: '序号',
@@ -539,12 +539,12 @@ export default {
           dataIndex: 'id'
         },
         {
-          title: '角色名称',
+          title: '岗位名称',
           align: 'center',
           dataIndex: 'roleName'
         },
         {
-          title: '角色状态',
+          title: '岗位状态',
           align: 'center',
           dataIndex: 'roleStatus',
           scopedSlots: { customRender: 'status' }
@@ -832,7 +832,7 @@ export default {
       this.handleFilter()
     },
     queryDataPermissionRole (row) {
-      this.drawerTitle = '查看角色和 [' + row.dataName + '] 数据权限的关联'
+      this.drawerTitle = '查看岗位和 [' + row.dataName + '] 数据权限的关联'
       this.dialogStatus = 'update'
       this.currentDataPermissionId = row.id
       this.getRoleDataPermissionList()

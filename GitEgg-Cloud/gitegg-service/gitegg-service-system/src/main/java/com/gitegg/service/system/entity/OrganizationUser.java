@@ -33,6 +33,10 @@ public class OrganizationUser extends BaseEntity {
     @TableField("organization_id")
     private Long organizationId;
 
+    @ApiModelProperty(value = "角色id")
+    @TableField("role_id")
+    private Long roleId;
+
     @ApiModelProperty(value = "用户id")
     @TableField("user_id")
     private Long userId;

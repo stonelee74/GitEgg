@@ -34,9 +34,9 @@
                 </a-col>
                 <a-col :md="6"
                        :sm="24">
-                  <a-form-model-item label="用户角色">
+                  <a-form-model-item label="用户岗位">
                     <a-select v-model="listQuery.roleId"
-                              placeholder="用户角色"
+                              placeholder="用户岗位"
                               allow-clear
                               show-search
                               :filter-option="filterOption">
@@ -241,7 +241,7 @@ export default {
           dataIndex: 'email'
         },
         {
-          title: '角色',
+          title: '岗位',
           align: 'center',
           width: 150,
           ellipsis: true,
