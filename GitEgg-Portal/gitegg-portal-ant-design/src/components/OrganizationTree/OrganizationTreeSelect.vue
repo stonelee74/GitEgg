@@ -1,6 +1,6 @@
 <template>
-  <div>
-    <a-input-search style="margin-bottom: 8px" placeholder="输入关键字进行过滤" @change="organizationTreeSearch" />
+  <div style="border: 1px solid #d9d9d9;">
+    <a-input-search class="this-input" placeholder="输入关键字进行过滤" @change="organizationTreeSearch" />
     <a-tree
       :ref="treeId"
       :default-expanded-keys="organizationTreeExpandedKeys"
@@ -193,5 +193,13 @@ export default {
 </script>
 
 <style lang="less" scoped>
+.this-input {
+  margin: 0 0 5px 0;
+
+  /deep/.ant-input {
+    border: none !important;
+    border-bottom: 1px solid #d9d9d9 !important;
+  }
+}
 
 </style>
