@@ -511,13 +511,6 @@ export default {
       // 表头
       columns: [
         {
-          title: '序号',
-          align: 'center',
-          width: 80,
-          dataIndex: 'id',
-          fixed: 'left'
-        },
-        {
           title: '账号',
           align: 'center',
           width: 100,

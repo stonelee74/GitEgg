@@ -33,10 +33,13 @@ router.beforeEach((to, from, next) => {
             const resources = res.data && res.data.menuTree
 
             const accessRouters = await store.dispatch('GenerateRouters', roles)
+            // console.log('accessRouters：' + accessRouters)
             router.addRoutes(accessRouters)
             // generate accessible routes map based on roles
             const accessResourcesRouters = await store.dispatch('GenerateResourcesRouters', resources)
             // dynamically add accessible routes
+            // console.log('accessResourcesRouters：')
+            // console.log(accessResourcesRouters)
             router.addRoutes(accessResourcesRouters)
             // 请求带有 redirect 重定向时，登录自动重定向到该地址
             const redirect = decodeURIComponent(from.query.redirect || to.path)

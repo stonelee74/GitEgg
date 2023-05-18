@@ -97,6 +97,17 @@ public class UserController {
     }
 
     /**
+     * 添加用户
+     */
+    @PostMapping("/addOld")
+    @ApiOperation(value = "添加用户")
+    @ResubmitLock(interval = 5)
+    public Result<?> add(@RequestBody @Valid CreateUserDTO user) {
+        CreateUserDTO userDTO = userService.createUser(user);
+        return Result.data(userDTO.getId());
+    }
+
+    /**
      * 修改用户
      */
     @PostMapping("/update")
