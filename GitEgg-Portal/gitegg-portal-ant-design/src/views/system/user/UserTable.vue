@@ -536,34 +536,6 @@ export default {
           fixed: 'left'
         },
         {
-          title: '组织机构',
-          align: 'center',
-          ellipsis: true,
-          width: 200,
-          dataIndex: 'organizationName'
-        },
-        {
-          title: '手机号',
-          align: 'center',
-          width: 130,
-          ellipsis: true,
-          dataIndex: 'mobile'
-        },
-        {
-          title: '邮箱',
-          align: 'center',
-          ellipsis: true,
-          width: 150,
-          dataIndex: 'email'
-        },
-        {
-          title: '岗位',
-          align: 'center',
-          width: 150,
-          ellipsis: true,
-          dataIndex: 'roleName'
-        },
-        {
           title: '性别',
           align: 'center',
           dataIndex: 'gender',
@@ -572,11 +544,18 @@ export default {
           scopedSlots: { customRender: 'gender' }
         },
         {
-          title: '注册日期',
+          title: '组织机构',
           align: 'center',
-          dataIndex: 'createTime',
+          ellipsis: true,
           width: 200,
-          scopedSlots: { customRender: 'createTime' }
+          dataIndex: 'organizationName'
+        },
+        {
+          title: '岗位',
+          align: 'center',
+          width: 150,
+          ellipsis: true,
+          dataIndex: 'roleName'
         },
         {
           title: '状态',
@@ -599,6 +578,27 @@ export default {
           width: 50,
           scopedSlots: { customRender: 'isAuto' }
         },
+        {
+          title: '手机号',
+          align: 'center',
+          width: 130,
+          ellipsis: true,
+          dataIndex: 'mobile'
+        },
+        {
+          title: '邮箱',
+          align: 'center',
+          ellipsis: true,
+          width: 150,
+          dataIndex: 'email'
+        },
+        {
+          title: '注册日期',
+          align: 'center',
+          dataIndex: 'createTime',
+          width: 200,
+          scopedSlots: { customRender: 'createTime' }
+        },       
         {
           title: '操作',
           align: 'center',
