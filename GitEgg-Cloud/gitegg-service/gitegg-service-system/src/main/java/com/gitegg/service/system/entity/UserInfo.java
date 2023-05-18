@@ -1,6 +1,8 @@
 
 package com.gitegg.service.system.entity;
 
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableLogic;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -13,6 +15,9 @@ import java.util.List;
 @Data
 @ApiModel(description = "用户信息")
 public class UserInfo extends User {
+
+    @ApiModelProperty(value = "机构用户id")
+    private Long organizationUserId;
 
     @ApiModelProperty(value = "机构id")
     private Long organizationId;
@@ -70,5 +75,11 @@ public class UserInfo extends User {
 
     @ApiModelProperty(value = "前端展示的用户菜单树")
     private List<Resource> menuTree;
+
+    @ApiModelProperty(value = "是否主岗")
+    private Integer isPrimary;
+
+    @ApiModelProperty(value = "是否自动生成")
+    private Integer isAuto;
 
 }

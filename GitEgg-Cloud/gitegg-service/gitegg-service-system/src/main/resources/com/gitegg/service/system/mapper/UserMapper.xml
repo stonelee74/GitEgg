@@ -118,7 +118,7 @@
 
     <!-- 分页查询用户列表 -->
     <select id="queryUserPage" resultType="com.gitegg.service.system.entity.UserInfo" parameterType="com.gitegg.service.system.entity.User">
-        SELECT DISTINCT
+        SELECT
         su.id AS id,
         su.tenant_id AS tenantId,
         su.account AS account,
@@ -139,11 +139,14 @@
         su.creator AS creator,
         su.update_time AS updateTime,
         su.operator AS operator,
-        GROUP_CONCAT(DISTINCT sr.id) AS roleIds,
-        GROUP_CONCAT(DISTINCT sr.role_key) AS roleKey,
-        GROUP_CONCAT(DISTINCT sr.role_name) AS roleName,
+        sr.id AS roleId,
+        sr.role_key AS roleKey,
+        sr.role_name AS roleName,
         so.id AS organizationId,
-        so.organization_name AS organizationName
+        so.organization_name AS organizationName,
+        sou.id AS organizationUserId,
+        sou.is_primary AS isPrimary,
+        sou.is_auto AS isAuto
         FROM t_sys_user su
         INNER JOIN t_sys_organization_user AS sou ON su.id = sou.user_id AND sou.del_flag = 0
         INNER JOIN t_sys_organization so ON sou.organization_id = so.id AND so.del_flag = 0
@@ -189,7 +192,6 @@
                 AND DATE_FORMAT(su.create_time,'%Y-%m-%d') &lt;= DATE_FORMAT(#{user.endDateTime},'%Y-%m-%d')
             </if>
         </trim>
-        GROUP BY su.id
         ORDER BY su.create_time DESC
     </select>    
 

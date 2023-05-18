@@ -14,11 +14,13 @@
         <result column="update_time" property="updateTime"/>
         <result column="operator" property="operator"/>
         <result column="del_flag" property="delFlag"/>
+        <result column="is_primary" property="isPrimary"/>
+        <result column="is_auto" property="isAuto"/>
     </resultMap>
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        id, organization_id, role_id, user_id, create_time, creator, update_time, operator, del_flag
+        id, organization_id, role_id, user_id, create_time, creator, update_time, operator, del_flag, is_primary, is_auto
     </sql>
 
 </mapper>

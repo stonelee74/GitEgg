@@ -147,23 +147,32 @@
                    :rowSelection="{ selectedRowKeys: this.selectedRowKeys, onChange: this.onSelectChange }">
             <span slot="gender"
                   slot-scope="text, record">
-              <span>{{ record.gender | genderNameFilter }}</span>
+              <a-tag color="pink" v-if="record.gender == 0">女</a-tag>
+              <a-tag color="blue" v-if="record.gender == 1">男</a-tag>
+              <a-tag v-if="record.gender == 2">保密</a-tag>
             </span>
             <span slot="status"
                   slot-scope="text, record">
-              <a-tag :color="record.status | statusFilter">{{ record.status | statusNameFilter }}</a-tag>
+              <a-tag color="red" v-if="record.status == 0">禁用</a-tag>
+              <a-tag color="green" v-if="record.status == 1">启用</a-tag>
+              <a-tag v-if="record.gender == 2">未激活</a-tag>
             </span>
             <span slot="createTime"
                   slot-scope="text, record">
               <span>{{ record.createTime | moment }}</span>
             </span>
+            <span slot="isPrimary"
+                  slot-scope="text, record">
+              <a-tag color="pink" v-if="record.isPrimary == 0">兼岗</a-tag>
+              <a-tag color="green" v-if="record.isPrimary == 1">主岗</a-tag>
+            </span>
+            <span slot="isAuto"
+                  slot-scope="text, record">
+              <a-tag color="pink" v-if="record.isAuto == 1">是</a-tag>
+            </span>
             <span slot="action"
                   slot-scope="text, record">
               <a @click="handleUpdate(record)" v-hasAnyPerms="['system:user:update']">编辑</a>
-              <a-divider type="vertical" />
-              <a href="javascript:;"
-                 @click="handleDataPermission(record)"
-                 v-hasAnyPerms="['system:user:update:organization:data:permission']">机构权限</a>
               <a-divider type="vertical" />
               <a-dropdown>
                 <a class="ant-dropdown-link">
@@ -351,32 +360,32 @@ export default {
     STable,
     OrganizationTreeSelect
   },
-  filters: {
-    statusFilter (status) {
-      const statusMap = {
-        1: 'green',
-        2: '',
-        0: 'pink'
-      }
-      return statusMap[status]
-    },
-    statusNameFilter (status) {
-      const statusNameMap = {
-        1: '启用',
-        2: '未激活',
-        0: '禁用'
-      }
-      return statusNameMap[status]
-    },
-    genderNameFilter (sex) {
-      const sexNameMap = {
-        '1': '男',
-        '2': '保密',
-        '0': '女'
-      }
-      return sexNameMap[sex]
-    }
-  },
+  // filters: {
+  //   statusFilter (status) {
+  //     const statusMap = {
+  //       1: 'green',
+  //       2: '',
+  //       0: 'pink'
+  //     }
+  //     return statusMap[status]
+  //   },
+  //   statusNameFilter (status) {
+  //     const statusNameMap = {
+  //       1: '启用',
+  //       2: '未激活',
+  //       0: '禁用'
+  //     }
+  //     return statusNameMap[status]
+  //   },
+  //   genderNameFilter (sex) {
+  //     const sexNameMap = {
+  //       '1': '男',
+  //       '2': '保密',
+  //       '0': '女'
+  //     }
+  //     return sexNameMap[sex]
+  //   }
+  // },
   data () {
     var validAccount = (rule, value, callback) => {
       var keyData = {
@@ -558,7 +567,7 @@ export default {
           title: '性别',
           align: 'center',
           dataIndex: 'gender',
-          width: 100,
+          width: 50,
           ellipsis: true,
           scopedSlots: { customRender: 'gender' }
         },
@@ -573,14 +582,28 @@ export default {
           title: '状态',
           align: 'center',
           dataIndex: 'status',
-          width: 100,
+          width: 50,
           scopedSlots: { customRender: 'status' }
+        },
+        {
+          title: '主岗',
+          align: 'center',
+          dataIndex: 'isPrimary',
+          width: 50,
+          scopedSlots: { customRender: 'isPrimary' }
+        },
+        {
+          title: '自动',
+          align: 'center',
+          dataIndex: 'isAuto',
+          width: 50,
+          scopedSlots: { customRender: 'isAuto' }
         },
         {
           title: '操作',
           align: 'center',
           dataIndex: 'action',
-          width: '200px',
+          width: '140px',
           fixed: 'right',
           scopedSlots: { customRender: 'action' }
         }
@@ -861,14 +884,14 @@ export default {
         this.selectedOrgOptions = orgStr.split(',')
       }
 
-      if (!(this.userForm.roleIds instanceof Array)) {
-        var roleIds = this.userForm.roleIds.split(',')
-        var arrRoleIds = []
-        for (var roleId of roleIds) {
-          arrRoleIds.push(roleId)
-        }
-        this.userForm.roleIds = arrRoleIds
-      }
+      // if (!(this.userForm.roleIds instanceof Array)) {
+      //   var roleIds = this.userForm.roleIds.split(',')
+      //   var arrRoleIds = []
+      //   for (var roleId of roleIds) {
+      //     arrRoleIds.push(roleId)
+      //   }
+      //   this.userForm.roleIds = arrRoleIds
+      // }
 
       this.userForm.status = this.userForm.status
       this.userForm.gender = this.userForm.gender

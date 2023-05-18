@@ -1,9 +1,6 @@
 package com.gitegg.service.system.entity;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.*;
 import com.gitegg.platform.mybatis.entity.BaseEntity;
 
 import io.swagger.annotations.ApiModel;
@@ -41,4 +38,11 @@ public class OrganizationUser extends BaseEntity {
     @TableField("user_id")
     private Long userId;
 
+    @ApiModelProperty("是否主岗（1:主岗 0:兼职）")
+    @TableField("is_primary")
+    private Integer isPrimary;
+
+    @ApiModelProperty("1:自动 0:手动")
+    @TableField("is_auto")
+    private Integer isAuto;
 }
