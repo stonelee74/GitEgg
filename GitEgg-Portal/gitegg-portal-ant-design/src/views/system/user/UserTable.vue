@@ -342,6 +342,16 @@
                           :rules="otherRules"
                           :label-col="userLabelCol"
                           :wrapper-col="userWrapperCol">
+              <a-form-model-item label="所属机构"
+                                 prop="orgList">
+                <a-cascader :options="orgList"
+                            v-model="selectedOrgOptions"
+                            :field-names="propsOrg"
+                            :show-search="{ filter }"
+                            :display-render="displayRender"
+                            change-on-select
+                            placeholder="所属机构" />
+              </a-form-model-item>
               <a-form-model-item label="现有用户"
                                  prop="id">
                 <a-select v-model="userForm.id"
@@ -934,6 +944,12 @@ export default {
     },
     // 执行添加现有员工
     addOldUser () {
+      if (this.selectedOrgOptions.length > 0) {
+        this.userForm.organizationId = this.selectedOrgOptions[this.selectedOrgOptions.length - 1]
+      } else {
+        this.userForm.organizationId = this.listQuery.organizationId
+      }
+
       this.$refs['oldUserForm'].validate(valid => {
         if (valid) {
           updateUser(this.userForm).then(() => {
