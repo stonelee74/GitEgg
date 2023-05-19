@@ -1,6 +1,7 @@
 package com.gitegg.service.system.controller;
 
 import com.alibaba.excel.EasyExcel;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -83,6 +84,16 @@ public class UserController {
     public Result<Page<UserInfo>> list( @ApiIgnore QueryUserDTO user, @ApiIgnore Page<UserInfo> page) {
         Page<UserInfo> pageUser = userService.queryUserPage(page, user);
         return Result.data(pageUser);
+    }
+
+
+    @GetMapping("/simpleList")
+    @ApiOperation(value = "查询用户列表")
+    public Result<List<User>> simpleList(@ApiIgnore QueryUserDTO user) {
+        LambdaQueryWrapper<User> qw = new LambdaQueryWrapper<>();
+        qw.select(User::getId, User::getAccount, User::getNickname, User::getRealName);
+        qw.orderByAsc(User::getRealName);
+        return Result.data(userService.list(qw));
     }
 
     /**

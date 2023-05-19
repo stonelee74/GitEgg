@@ -1,5 +1,13 @@
 import request from '@/utils/request'
 
+export function simpleList (query) {
+  return request({
+    url: '/gitegg-service-system/user/simpleList',
+    method: 'get',
+    params: query
+  })
+}
+
 export function fetchList (query) {
   return request({
     url: '/gitegg-service-system/user/list',

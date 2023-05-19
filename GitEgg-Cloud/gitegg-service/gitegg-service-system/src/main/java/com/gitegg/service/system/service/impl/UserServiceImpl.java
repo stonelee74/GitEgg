@@ -266,6 +266,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
             userEntity.setPassword(cryptPwd);
         }
         boolean result = this.updateById(userEntity);
+
+
+
 //        // 修改用户机构
 //        if (result && null != user.getOrganizationId()) {
 //            LambdaQueryWrapper<OrganizationUser> orgUserLambdaQueryWrapper = new LambdaQueryWrapper<>();
@@ -300,41 +303,42 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
 //            }
 //        }
 
-        List<Long> roleIds = user.getRoleIds();
-        if (result && !CollectionUtils.isEmpty(roleIds)) {
-            // 查询出用户原先的角色信息
-            LambdaQueryWrapper<OrganizationUser> userRoleLambdaQueryWrapper = new LambdaQueryWrapper<>();
-            userRoleLambdaQueryWrapper
-                    .eq(OrganizationUser::getOrganizationId, user.getOrganizationId())
-                    .eq(OrganizationUser::getUserId, userEntity.getId());
-
-            List<OrganizationUser> userRoleList = organizationUserService.list(userRoleLambdaQueryWrapper);
-            // 已有数据和最新数据的差集,即原先的数据有，但最新的数据没有，得到差集是需要删除的角色
-            List<OrganizationUser> userRoleDeleteList = userRoleList.stream()
-                    .filter(item -> !roleIds.contains(item.getRoleId())).collect(Collectors.toList());
-            if (!StringUtils.isEmpty(userRoleDeleteList)) {
-                organizationUserService.removeByIds(userRoleDeleteList.stream()
-                        .map(OrganizationUser::getId).collect(Collectors.toList()));
-            }
-
-            // 最新数据和已有数据的差集，即传进来的数据有，但是原先数据没有，得到的差集是需要新增的角色。
-            List<Long> userRoleAddList = roleIds.stream().filter(item ->
-                    !userRoleList.stream().map(e -> e.getRoleId())
-                            .collect(Collectors.toList())
-                            .contains(item)).collect(Collectors.toList());
-            if (!StringUtils.isEmpty(userRoleAddList)) {
-                List<OrganizationUser> userRoleNewList = new ArrayList<>();
-                //新增库里不存在的权限
-                for (Long roleId : userRoleAddList) {
-                    OrganizationUser orgUser = new OrganizationUser();
-                    orgUser.setOrganizationId(user.getOrganizationId());
-                    orgUser.setUserId(userEntity.getId());
-                    orgUser.setRoleId(roleId);
-                    userRoleNewList.add(orgUser);
-                }
-                organizationUserService.saveBatch(userRoleNewList);
-            }
-        } else if (result && null != user.getRoleId()) {
+//        List<Long> roleIds = user.getRoleIds();
+//        if (result && !CollectionUtils.isEmpty(roleIds)) {
+//            // 查询出用户原先的角色信息
+//            LambdaQueryWrapper<OrganizationUser> userRoleLambdaQueryWrapper = new LambdaQueryWrapper<>();
+//            userRoleLambdaQueryWrapper
+//                    .eq(OrganizationUser::getOrganizationId, user.getOrganizationId())
+//                    .eq(OrganizationUser::getUserId, userEntity.getId());
+//
+//            List<OrganizationUser> userRoleList = organizationUserService.list(userRoleLambdaQueryWrapper);
+//            // 已有数据和最新数据的差集,即原先的数据有，但最新的数据没有，得到差集是需要删除的角色
+//            List<OrganizationUser> userRoleDeleteList = userRoleList.stream()
+//                    .filter(item -> !roleIds.contains(item.getRoleId())).collect(Collectors.toList());
+//            if (!StringUtils.isEmpty(userRoleDeleteList)) {
+//                organizationUserService.removeByIds(userRoleDeleteList.stream()
+//                        .map(OrganizationUser::getId).collect(Collectors.toList()));
+//            }
+//
+//            // 最新数据和已有数据的差集，即传进来的数据有，但是原先数据没有，得到的差集是需要新增的角色。
+//            List<Long> userRoleAddList = roleIds.stream().filter(item ->
+//                    !userRoleList.stream().map(e -> e.getRoleId())
+//                            .collect(Collectors.toList())
+//                            .contains(item)).collect(Collectors.toList());
+//            if (!StringUtils.isEmpty(userRoleAddList)) {
+//                List<OrganizationUser> userRoleNewList = new ArrayList<>();
+//                //新增库里不存在的权限
+//                for (Long roleId : userRoleAddList) {
+//                    OrganizationUser orgUser = new OrganizationUser();
+//                    orgUser.setOrganizationId(user.getOrganizationId());
+//                    orgUser.setUserId(userEntity.getId());
+//                    orgUser.setRoleId(roleId);
+//                    userRoleNewList.add(orgUser);
+//                }
+//                organizationUserService.saveBatch(userRoleNewList);
+//            }
+//        } else if (result && null != user.getRoleId()) {
+        if (result && null != user.getRoleId()) {
             OrganizationUser orgUser = new OrganizationUser();
             orgUser.setOrganizationId(user.getOrganizationId());
             orgUser.setUserId(userEntity.getId());

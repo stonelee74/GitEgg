@@ -112,11 +112,11 @@
                 </a-dropdown>
                 <a-button type="primary"
                           icon="plus"
-                          @click="handleCreate"
+                          @click="handleNew"
                           v-hasAnyPerms="['system:user:create']">添加新员工</a-button>
                 <a-button type="primary"
                           icon="plus"
-                          @click="handleCreate"
+                          @click="handleOld"
                           v-hasAnyPerms="['system:user:create']">添加现有员工</a-button>
                 <a-button type="primary"
                           icon="cloud-download"
@@ -219,15 +219,16 @@
                           :rules="rules"
                           :label-col="userLabelCol"
                           :wrapper-col="userWrapperCol">
-              <a-form-model-item label="组织机构"
-                                 prop="orgList">
+              <a-form-model-item label="所属机构"
+                                 prop="orgList"
+                                 v-if="dialogStatus!=='update'">
                 <a-cascader :options="orgList"
                             v-model="selectedOrgOptions"
                             :field-names="propsOrg"
                             :show-search="{ filter }"
                             :display-render="displayRender"
                             change-on-select
-                            placeholder="组织机构" />
+                            placeholder="所属机构" />
               </a-form-model-item>
               <a-form-model-item label="用户账号"
                                  prop="account">
@@ -261,18 +262,26 @@
               </a-form-model-item>
               <a-form-model-item label="用户岗位"
                                  prop="roleId">
-                <a-select v-model="userForm.roleIds"
+                <a-select v-model="userForm.roleId"
                           placeholder="选择用户岗位"
                           allow-clear
                           show-search
-                          :filter-option="filterOption"
-                          mode="multiple">
+                          :filter-option="filterOption">
                   <a-select-option v-for="item in roleList"
                                    :key="item.roleKey"
                                    :value="item.id">
                     {{ item.roleName }}
                   </a-select-option>
                 </a-select>
+              </a-form-model-item>
+              <a-form-model-item label="岗位类型"
+                                 prop="isPrimary">
+                <a-radio-group v-model="userForm.isPrimary"
+                               name="isPrimary"
+                               button-style="solid">
+                  <a-radio-button :value="1">主要岗位</a-radio-button>
+                  <a-radio-button :value="0">兼职岗位</a-radio-button>
+                </a-radio-group>
               </a-form-model-item>
               <a-form-model-item label="用户地址"
                                  prop="areas">
@@ -290,19 +299,21 @@
               <a-form-model-item label="性别"
                                  prop="gender">
                 <a-radio-group v-model="userForm.gender"
-                               name="gender">
-                  <a-radio :value="'1'">男性</a-radio>
-                  <a-radio :value="'0'">女性</a-radio>
-                  <a-radio :value="'2'">保密</a-radio>
+                               name="gender"
+                               button-style="solid">
+                  <a-radio-button :value="'1'">男性</a-radio-button>
+                  <a-radio-button :value="'0'">女性</a-radio-button>
+                  <a-radio-button :value="'2'">保密</a-radio-button>
                 </a-radio-group>
               </a-form-model-item>
               <a-form-model-item label="状态"
                                  prop="status">
                 <a-radio-group v-model="userForm.status"
-                               name="status">
-                  <a-radio :value="1">启用</a-radio>
-                  <a-radio :value="0">禁用</a-radio>
-                  <a-radio :value="2">未激活</a-radio>
+                               name="status"
+                               button-style="solid">
+                  <a-radio-button :value="1">启用</a-radio-button>
+                  <a-radio-button :value="0">禁用</a-radio-button>
+                  <a-radio-button :value="2">未激活</a-radio-button>
                 </a-radio-group>
               </a-form-model-item>
               <a-form-model-item label="备注">
@@ -316,6 +327,62 @@
               <a-button @click="dialogFormVisible = false">取消</a-button>
               <a-button v-if="dialogStatus=='create'" type="primary" @click="createData" v-hasAnyPerms="['system:user:create']">确定</a-button>
               <a-button v-else type="primary" @click="updateData" v-hasAnyPerms="['system:user:update']">修改</a-button>
+            </div>
+          </a-drawer>
+
+          <a-drawer title="添加现有员工"
+                    :maskClosable="false"
+                    :closable="true"
+                    :visible="dialogOldUserFormVisible"
+                    placement="right"
+                    :width="700"
+                    @close="() => dialogOldUserFormVisible = false">
+            <a-form-model ref="oldUserForm"
+                          :model="oldUserForm"
+                          :rules="oldRules"
+                          :label-col="userLabelCol"
+                          :wrapper-col="userWrapperCol">
+              <a-form-model-item label="现有用户"
+                                 prop="id">
+                <a-select v-model="userForm.id"
+                          placeholder="选择用户"
+                          allow-clear
+                          show-search
+                          :filter-option="filterOption">
+                  <a-select-option v-for="item in userList"
+                                   :key="item.realName"
+                                   :value="item.id">
+                    {{ item.realName }}（{{ item.account }}）
+                  </a-select-option>
+                </a-select>
+              </a-form-model-item>
+              <a-form-model-item label="用户岗位"
+                                 prop="roleId">
+                <a-select v-model="userForm.roleId"
+                          placeholder="选择用户岗位"
+                          allow-clear
+                          show-search
+                          :filter-option="filterOption">
+                  <a-select-option v-for="item in roleList"
+                                   :key="item.roleKey"
+                                   :value="item.id">
+                    {{ item.roleName }}
+                  </a-select-option>
+                </a-select>
+              </a-form-model-item>
+              <a-form-model-item label="岗位类型"
+                                 prop="isPrimary">
+                <a-radio-group v-model="userForm.isPrimary"
+                               name="isPrimary"
+                               button-style="solid">
+                  <a-radio-button :value="1">主要岗位</a-radio-button>
+                  <a-radio-button :value="0">兼职岗位</a-radio-button>
+                </a-radio-group>
+              </a-form-model-item>
+            </a-form-model>
+            <div class="footer-button">
+              <a-button @click="dialogOldUserFormVisible = false">取消</a-button>
+              <a-button type="primary" @click="addOldUser" v-hasAnyPerms="['system:user:update']">添加</a-button>
             </div>
           </a-drawer>
 
@@ -350,7 +417,7 @@
 
 <script>
 import { STable, OrganizationTreeSelect } from '@/components'
-import { fetchList, createUser, resetUserPassword, deleteUser, batchDeleteUser, updateUser, updateUserStatus, fetchRoleList, updateUserDataPermission, checkUserExist } from '@/api/system/user'
+import { fetchList, simpleList, createUser, resetUserPassword, deleteUser, batchDeleteUser, updateUser, updateUserStatus, fetchRoleList, updateUserDataPermission, checkUserExist } from '@/api/system/user'
 import { fetchOrgList } from '@/api/system/organization'
 import moment from 'moment'
 import Data from '@/api/pcaa'
@@ -360,32 +427,6 @@ export default {
     STable,
     OrganizationTreeSelect
   },
-  // filters: {
-  //   statusFilter (status) {
-  //     const statusMap = {
-  //       1: 'green',
-  //       2: '',
-  //       0: 'pink'
-  //     }
-  //     return statusMap[status]
-  //   },
-  //   statusNameFilter (status) {
-  //     const statusNameMap = {
-  //       1: '启用',
-  //       2: '未激活',
-  //       0: '禁用'
-  //     }
-  //     return statusNameMap[status]
-  //   },
-  //   genderNameFilter (sex) {
-  //     const sexNameMap = {
-  //       '1': '男',
-  //       '2': '保密',
-  //       '0': '女'
-  //     }
-  //     return sexNameMap[sex]
-  //   }
-  // },
   data () {
     var validAccount = (rule, value, callback) => {
       var keyData = {
@@ -488,6 +529,7 @@ export default {
       ],
       leftSelectedKeys: [],
       dialogFormVisible: false,
+      dialogOldUserFormVisible: false,
       dialogDataPermissionVisible: false,
       drawerTitle: '设置用户机构权限',
       checkStrictly: true,
@@ -498,19 +540,21 @@ export default {
         create: '添加用户'
       },
       userForm: {
+        organizationUserId: '',
         id: '',
         account: '',
         nickname: '',
         realName: '',
         mobile: '',
         email: '',
-        roleIds: [],
+        roleId: '',
         organizationId: '',
         gender: '1',
         status: 1,
         areas: [],
         street: '',
-        comments: ''
+        comments: '',
+        isPrimary: 0
       },
       dataPermissionForm: {
         userId: '',
@@ -598,7 +642,7 @@ export default {
           dataIndex: 'createTime',
           width: 200,
           scopedSlots: { customRender: 'createTime' }
-        },       
+        },
         {
           title: '操作',
           align: 'center',
@@ -670,6 +714,7 @@ export default {
         value: 'id',
         label: 'organizationName'
       },
+      editMode: '',
       orgList: [],
       orgTreeList: [],
       orgSearchTreeList: [],
@@ -678,6 +723,7 @@ export default {
       removeOrgPermission: [],
       selectedRowKeys: [],
       selectedRows: [],
+      userList: [],
       userPagination: {
         defaultPageSize: 10,
         showQuickJumper: true,
@@ -726,6 +772,13 @@ export default {
           var orgListStr = JSON.stringify(this.orgList)
           this.orgTreeList = JSON.parse(orgListStr.replace(/"isLeaf":1/g, '"isLeaf":true').replace(/"isLeaf":0/g, '"isLeaf":false'))
         }
+        this.listLoading = false
+      })
+    },
+    getUserList () {
+      this.listLoading = true
+      simpleList({ parentId: 0 }).then(response => {
+        this.userList = response.data
         this.listLoading = false
       })
     },
@@ -843,12 +896,35 @@ export default {
         removeDataPermissions: []
       }
     },
-    handleCreate () {
+    // 添加一个新员工
+    handleNew () {
       this.resetUserForm()
-      this.dialogStatus = 'create'
+      this.dialogStatus = 'new'
       this.dialogFormVisible = true
       this.$nextTick(() => {
         this.$refs['userForm'].clearValidate()
+      })
+    },
+    // 显示添加现有员工对话框
+    handleOld () {
+      this.getUserList()
+      this.resetUserForm()
+      this.dialogStatus = 'old'
+      this.dialogOldUserFormVisible = true
+      this.$nextTick(() => {
+        this.$refs['userForm'].clearValidate()
+      })
+    },
+    // 执行添加现有员工
+    addOldUser () {
+      this.$refs['userForm'].validate(valid => {
+        if (valid) {
+          createUser(this.oldUserForm).then(() => {
+            this.handleTableRefresh()
+            this.dialogOldUserFormVisible = false
+            this.$message.success('更新成功')
+          })
+        }
       })
     },
     createData () {
@@ -867,6 +943,7 @@ export default {
         }
       })
     },
+    // 编辑一行用户信息
     handleUpdate (row) {
       this.resetUserForm()
       this.userForm = Object.assign({}, row) // copy obj
@@ -893,8 +970,8 @@ export default {
       //   this.userForm.roleIds = arrRoleIds
       // }
 
-      this.userForm.status = this.userForm.status
-      this.userForm.gender = this.userForm.gender
+      // this.userForm.status = this.userForm.status
+      // this.userForm.gender = this.userForm.gender
       this.dialogStatus = 'update'
       this.dialogFormVisible = true
       this.$nextTick(() => {

@@ -6,6 +6,7 @@ import java.util.List;
 
 import javax.validation.constraints.*;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -88,18 +89,21 @@ public class UpdateUserDTO implements Serializable {
     private String comments;
 
     @ApiModelProperty(value = "角色id（单角色时）")
-    private Long roleId;
+    private Long organizationUserId;
 
     @ApiModelProperty(value = "组织机构id")
     private Long organizationId;
 
-    @ApiModelProperty(value = "用户角色id数组（多角色时）")
-    private List<Long> roleIds;
+    @ApiModelProperty(value = "角色id（单角色时）")
+    private Long roleId;
 
     @ApiModelProperty(value = "用户新密码")
     private String newPwd;
 
     @ApiModelProperty(value = "用户旧密码")
     private String oldPwd;
+
+    @ApiModelProperty("是否主岗（1:主岗 0:兼职）")
+    private Integer isPrimary;
 
 }
