@@ -157,7 +157,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
      */
     @Override
     public CreateUserDTO createUser(CreateUserDTO user) {
-
         User userEntity = BeanCopierUtils.copyByClass(user, User.class);
         // 查询已存在的用户，用户名、昵称、邮箱、手机号有任一重复即视为用户已存在，真实姓名是可以重复的。
         List<User> userList = userMapper.queryExistUser(userEntity);
@@ -242,104 +241,39 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
      */
     @Override
     public boolean updateUser(UpdateUserDTO user) {
+        Long orgUserId = user.getOrganizationUserId();
+        Long userId = user.getId();
+        if (orgUserId != null) {
+            OrganizationUser orgUser = organizationUserService.getById(orgUserId);
+            if (orgUser == null) {
+                throw new BusinessException("无法找到指定记录");
+            }
 
-        User userEntity = BeanCopierUtils.copyByClass(user, User.class);
-        // 查询已存在的用户，用户名、昵称、邮箱、手机号有任一重复即视为用户已存在，真实姓名是可以重复的。
-        List<User> userList = userMapper.queryExistUser(userEntity);
-        if (!CollectionUtils.isEmpty(userList)) {
-            throw new BusinessException("账号已经存在");
-        }
+            User userEntity = BeanCopierUtils.copyByClass(user, User.class);
+            // 查询已存在的用户，用户名、昵称、邮箱、手机号有任一重复即视为用户已存在，真实姓名是可以重复的。
+            List<User> userList = userMapper.queryExistUser(userEntity);
+            if (!CollectionUtils.isEmpty(userList)) {
+                throw new BusinessException("账号已经存在");
+            }
 
-        // 处理前端传过来的省市区
-        userEntity = resolveAreas(userEntity, user.getAreas());
+            // 处理前端传过来的省市区
+            userEntity = resolveAreas(userEntity, user.getAreas());
 
-        String pwd = userEntity.getPassword();
-        User oldInfo = this.getById(userEntity.getId());
+            String pwd = userEntity.getPassword();
+            User oldInfo = this.getById(userEntity.getId());
 
-        if (oldInfo == null) {
-            throw new BusinessException("用户未找到");
-        }
+            if (oldInfo == null) {
+                throw new BusinessException("用户未找到");
+            }
 
-        if (!StringUtils.isEmpty(pwd)) {
-            PasswordEncoder passwordEncoder = PasswordEncoderFactories.createDelegatingPasswordEncoder();
-            String cryptPwd = passwordEncoder.encode(AuthConstant.BCRYPT + oldInfo.getAccount() + DigestUtils.md5DigestAsHex(pwd.getBytes()));
-            userEntity.setPassword(cryptPwd);
-        }
-        boolean result = this.updateById(userEntity);
+            if (!StringUtils.isEmpty(pwd)) {
+                PasswordEncoder passwordEncoder = PasswordEncoderFactories.createDelegatingPasswordEncoder();
+                String cryptPwd = passwordEncoder.encode(AuthConstant.BCRYPT + oldInfo.getAccount() + DigestUtils.md5DigestAsHex(pwd.getBytes()));
+                userEntity.setPassword(cryptPwd);
+            }
+            boolean result = this.updateById(userEntity);
 
-
-
-//        // 修改用户机构
-//        if (result && null != user.getOrganizationId()) {
-//            LambdaQueryWrapper<OrganizationUser> orgUserLambdaQueryWrapper = new LambdaQueryWrapper<>();
-//            orgUserLambdaQueryWrapper.eq(OrganizationUser::getUserId, userEntity.getId())
-//                    .eq(OrganizationUser::getOrganizationId, user.getOrganizationId());
-//            OrganizationUser orgUserOld = organizationUserService.getOne(orgUserLambdaQueryWrapper);
-//            // 如果不存在时，则进行修改
-//            if (null == orgUserOld) {
-//                // 这里查询是为了只移出所在机构的数据权限，其他数据权限保持不变
-//                LambdaQueryWrapper<OrganizationUser> organizationUserRemoveWrapper = new LambdaQueryWrapper<>();
-//                organizationUserRemoveWrapper.eq(OrganizationUser::getUserId, userEntity.getId());
-//                OrganizationUser orgUserRemove = organizationUserService.getOne(organizationUserRemoveWrapper);
-//
-//                // 只移出所在机构的数据权限
-//                LambdaQueryWrapper<DataPermissionUser> dataPermissionRemoveWrapper = new LambdaQueryWrapper<>();
-//                dataPermissionRemoveWrapper.eq(DataPermissionUser::getUserId, userEntity.getId()).eq(DataPermissionUser::getOrganizationId, orgUserRemove.getOrganizationId());
-//
-//                //删除旧机构的数据权限
-//                dataPermissionUserService.remove(dataPermissionRemoveWrapper);
-//                //删除旧机构的组织机构关系
-//                organizationUserService.remove(organizationUserRemoveWrapper);
-//                //保存用户和组织机构的关系
-//                OrganizationUser orgUser = new OrganizationUser();
-//                orgUser.setUserId(userEntity.getId());
-//                orgUser.setOrganizationId(user.getOrganizationId());
-//                organizationUserService.save(orgUser);
-//                //默认增加用户所在机构数据权限，但是否有操作权限还是会根据资源权限判断
-//                DataPermissionUser dataPermissionUser = new DataPermissionUser();
-//                dataPermissionUser.setUserId(userEntity.getId());
-//                dataPermissionUser.setOrganizationId(user.getOrganizationId());
-//                dataPermissionUserService.save(dataPermissionUser);
-//            }
-//        }
-
-//        List<Long> roleIds = user.getRoleIds();
-//        if (result && !CollectionUtils.isEmpty(roleIds)) {
-//            // 查询出用户原先的角色信息
-//            LambdaQueryWrapper<OrganizationUser> userRoleLambdaQueryWrapper = new LambdaQueryWrapper<>();
-//            userRoleLambdaQueryWrapper
-//                    .eq(OrganizationUser::getOrganizationId, user.getOrganizationId())
-//                    .eq(OrganizationUser::getUserId, userEntity.getId());
-//
-//            List<OrganizationUser> userRoleList = organizationUserService.list(userRoleLambdaQueryWrapper);
-//            // 已有数据和最新数据的差集,即原先的数据有，但最新的数据没有，得到差集是需要删除的角色
-//            List<OrganizationUser> userRoleDeleteList = userRoleList.stream()
-//                    .filter(item -> !roleIds.contains(item.getRoleId())).collect(Collectors.toList());
-//            if (!StringUtils.isEmpty(userRoleDeleteList)) {
-//                organizationUserService.removeByIds(userRoleDeleteList.stream()
-//                        .map(OrganizationUser::getId).collect(Collectors.toList()));
-//            }
-//
-//            // 最新数据和已有数据的差集，即传进来的数据有，但是原先数据没有，得到的差集是需要新增的角色。
-//            List<Long> userRoleAddList = roleIds.stream().filter(item ->
-//                    !userRoleList.stream().map(e -> e.getRoleId())
-//                            .collect(Collectors.toList())
-//                            .contains(item)).collect(Collectors.toList());
-//            if (!StringUtils.isEmpty(userRoleAddList)) {
-//                List<OrganizationUser> userRoleNewList = new ArrayList<>();
-//                //新增库里不存在的权限
-//                for (Long roleId : userRoleAddList) {
-//                    OrganizationUser orgUser = new OrganizationUser();
-//                    orgUser.setOrganizationId(user.getOrganizationId());
-//                    orgUser.setUserId(userEntity.getId());
-//                    orgUser.setRoleId(roleId);
-//                    userRoleNewList.add(orgUser);
-//                }
-//                organizationUserService.saveBatch(userRoleNewList);
-//            }
-//        } else if (result && null != user.getRoleId()) {
-        if (result && null != user.getRoleId()) {
-            OrganizationUser orgUser = new OrganizationUser();
+            // 修改用户岗位信息
             orgUser.setOrganizationId(user.getOrganizationId());
             orgUser.setUserId(userEntity.getId());
             orgUser.setRoleId(user.getRoleId());
@@ -351,14 +285,37 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
 
             // 如果这个角色不存在，则删除其他角色，保存这个角色
             if (CollectionUtils.isEmpty(urList)) {
-                LambdaQueryWrapper<OrganizationUser> wpd = new LambdaQueryWrapper<>();
-                wpd.eq(OrganizationUser::getOrganizationId, user.getOrganizationId())
-                        .eq(OrganizationUser::getUserId, userEntity.getId());
-                organizationUserService.remove(wpd);
-                organizationUserService.save(orgUser);
+                organizationUserService.updateById(orgUser);
             }
+            return result;
         }
-        return result;
+
+        if (userId != null) {
+            // 如果指定用户ID，则执行添加现有员工兼职岗位功能
+            User userEntity = this.getById(userId);
+            if (userEntity == null) {
+                throw new BusinessException("指定用户不存在");
+            }
+
+            // 判断是否重复
+            LambdaQueryWrapper<OrganizationUser> qw = new LambdaQueryWrapper<>();
+            qw.eq(OrganizationUser::getOrganizationId, user.getOrganizationId())
+                    .eq(OrganizationUser::getUserId, userId)
+                    .eq(OrganizationUser::getRoleId, user.getRoleId());
+            List<OrganizationUser> userList = organizationUserService.list(qw);
+            if (userList.size() > 0) {
+                throw new BusinessException("岗位配置信息重复");
+            }
+
+            // 添加岗位信息
+            OrganizationUser orgUser = new OrganizationUser();
+            orgUser.setOrganizationId(user.getOrganizationId());
+            orgUser.setUserId(userEntity.getId());
+            orgUser.setRoleId(user.getRoleId());
+
+            return organizationUserService.save(orgUser);
+        }
+        throw new BusinessException("传递参数错误");
     }
 
     /**

@@ -138,7 +138,7 @@
           <s-table ref="userTable"
                    size="default"
                    bordered
-                   :rowKey="row=>row.id"
+                   :rowKey="row=>row.organizationUserId"
                    :columns="columns"
                    :data="loadData"
                    showPagination="auto"
@@ -338,8 +338,8 @@
                     :width="700"
                     @close="() => dialogOldUserFormVisible = false">
             <a-form-model ref="oldUserForm"
-                          :model="oldUserForm"
-                          :rules="oldRules"
+                          :model="userForm"
+                          :rules="otherRules"
                           :label-col="userLabelCol"
                           :wrapper-col="userWrapperCol">
               <a-form-model-item label="现有用户"
@@ -382,7 +382,7 @@
             </a-form-model>
             <div class="footer-button">
               <a-button @click="dialogOldUserFormVisible = false">取消</a-button>
-              <a-button type="primary" @click="addOldUser" v-hasAnyPerms="['system:user:update']">添加</a-button>
+              <a-button type="primary" @click="addOldUser" v-hasAnyPerms="['system:user:create']">添加</a-button>
             </div>
           </a-drawer>
 
@@ -691,8 +691,11 @@ export default {
           { min: 5, max: 32, message: '长度在 5 到 32 个字符', trigger: 'blur' },
           { validator: validemail, trigger: 'blur' }
         ],
-        roleIds: [
+        roleId: [
           { required: true, message: '请选择用户岗位', trigger: 'change' }
+        ],
+        isPrimary: [
+          { required: true, message: '请选择岗位类型', trigger: 'change' }
         ],
         organizationId: [
           { required: true, message: '请选择组织机构', trigger: 'change' }
@@ -705,6 +708,17 @@ export default {
         ],
         comments: [
           { required: true, message: '请填写备注信息', trigger: 'blur' }
+        ]
+      },
+      otherRules: {
+        id: [
+          { required: true, message: '请选择需要添加的用户', trigger: 'blur' }
+        ],
+        roleId: [
+          { required: true, message: '请选择用户对应的岗位', trigger: 'blur' }
+        ],
+        isPrimary: [
+          { required: true, message: '请选择岗位类型', trigger: 'blur' }
         ]
       },
       downloadLoading: false,
@@ -868,13 +882,15 @@ export default {
     },
     resetUserForm () {
       this.userForm = {
+        organizationUserId: '',
         id: '',
         account: '',
         nickname: '',
         realName: '',
         mobile: '',
         email: '',
-        roleIds: [],
+        roleId: '',
+        isPrimary: 1,
         organizationId: '',
         gender: '1',
         status: 1,
@@ -911,15 +927,16 @@ export default {
       this.resetUserForm()
       this.dialogStatus = 'old'
       this.dialogOldUserFormVisible = true
+      this.userForm.isPrimary = 0
       this.$nextTick(() => {
-        this.$refs['userForm'].clearValidate()
+        this.$refs['oldUserForm'].clearValidate()
       })
     },
     // 执行添加现有员工
     addOldUser () {
-      this.$refs['userForm'].validate(valid => {
+      this.$refs['oldUserForm'].validate(valid => {
         if (valid) {
-          createUser(this.oldUserForm).then(() => {
+          updateUser(this.userForm).then(() => {
             this.handleTableRefresh()
             this.dialogOldUserFormVisible = false
             this.$message.success('更新成功')
