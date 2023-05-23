@@ -17,6 +17,7 @@
         <module>gitegg-plugin</module>
         <module>gitegg-service</module>
         <module>gitegg-service-client</module>
+        <module>gitegg-platform</module>
     </modules>
 
     <properties>
