@@ -1,15 +1,14 @@
 package com.gitegg.gateway.filter;
 
-import com.gitegg.gateway.context.GatewayContext;
 import com.gitegg.gateway.domain.GatewayApiLog;
 import com.gitegg.gateway.option.FilterOrderEnum;
+import com.gitegg.gateway.context.GatewayContext;
 import com.gitegg.gateway.properties.GatewayPluginProperties;
 import com.gitegg.gateway.util.IpUtils;
 import com.gitegg.platform.base.constant.LogLevelConstant;
 import com.gitegg.platform.base.util.JsonUtils;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
 import org.springframework.cloud.gateway.route.Route;

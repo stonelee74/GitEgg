@@ -1,14 +1,10 @@
 package com.gitegg.gateway.filter;
 
 import com.gitegg.gateway.context.GatewayContext;
-import com.gitegg.gateway.domain.GatewayApiLog;
 import com.gitegg.gateway.option.FilterOrderEnum;
 import com.gitegg.gateway.properties.GatewayPluginProperties;
-import com.gitegg.gateway.util.IpUtils;
 import com.gitegg.gateway.util.SqlInjectionRuleUtils;
 import com.gitegg.gateway.util.WebfluxResponseUtils;
-import com.gitegg.platform.base.constant.LogLevelConstant;
-import com.gitegg.platform.base.util.JsonUtils;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
@@ -19,16 +15,13 @@ import org.springframework.core.Ordered;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.server.reactive.ServerHttpRequest;
-import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.MultiValueMap;
-import org.springframework.util.PathMatcher;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
 import java.net.URI;
-import java.util.ArrayList;
 import java.util.List;
 
 /**

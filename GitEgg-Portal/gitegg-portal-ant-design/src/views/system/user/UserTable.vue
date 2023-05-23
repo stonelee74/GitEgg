@@ -161,10 +161,11 @@
                   slot-scope="text, record">
               <span>{{ record.createTime | moment }}</span>
             </span>
-            <span slot="isPrimary"
+            <span slot="role"
                   slot-scope="text, record">
-              <a-tag color="pink" v-if="record.isPrimary == 0">兼岗</a-tag>
-              <a-tag color="green" v-if="record.isPrimary == 1">主岗</a-tag>
+              <a-tag color="pink" v-if="record.isPrimary == 0">兼</a-tag>
+              <a-tag color="green" v-if="record.isPrimary == 1">主</a-tag>
+              {{ record.roleName }}
             </span>
             <span slot="isAuto"
                   slot-scope="text, record">
@@ -190,12 +191,12 @@
                        v-if="record.status!=1"
                        size="mini"
                        type="success"
-                       @click="handleModifyStatus(record,1)">启用
+                       @click="handleModifyStatus(record,1)">启用用户
                     </a>
                     <a href="javascript:;"
                        v-if="record.status!=0 && record.status!=2"
                        size="mini"
-                       @click="handleModifyStatus(record,0)">禁用
+                       @click="handleModifyStatus(record,0)">禁用用户
                     </a>
                   </a-menu-item>
                   <a-menu-item v-hasAnyPerms="['system:user:delete', 'system:user:batch:delete']">
@@ -325,7 +326,7 @@
             </a-form-model>
             <div class="footer-button">
               <a-button @click="dialogFormVisible = false">取消</a-button>
-              <a-button v-if="dialogStatus=='create'" type="primary" @click="createData" v-hasAnyPerms="['system:user:create']">确定</a-button>
+              <a-button v-if="dialogStatus=='new'" type="primary" @click="createData" v-hasAnyPerms="['system:user:create']">保存</a-button>
               <a-button v-else type="primary" @click="updateData" v-hasAnyPerms="['system:user:update']">修改</a-button>
             </div>
           </a-drawer>
@@ -436,6 +437,31 @@ export default {
   components: {
     STable,
     OrganizationTreeSelect
+  },
+  filters: {
+    roleFilter (role) {
+      if (role === 1) {
+        return '主要岗位'
+      } else {
+        return '兼职岗位'
+      }
+    },
+    statusNameFilter (status) {
+      const statusNameMap = {
+        1: '启用',
+        2: '未激活',
+        0: '禁用'
+      }
+      return statusNameMap[status]
+    },
+    genderNameFilter (sex) {
+      const sexNameMap = {
+        '1': '男',
+        '2': '保密',
+        '0': '女'
+      }
+      return sexNameMap[sex]
+    }
   },
   data () {
     var validAccount = (rule, value, callback) => {
@@ -606,10 +632,11 @@ export default {
         },
         {
           title: '岗位',
-          align: 'center',
+          align: 'left',
           width: 150,
           ellipsis: true,
-          dataIndex: 'roleName'
+          dataIndex: 'roleName',
+          scopedSlots: { customRender: 'role' }
         },
         {
           title: '状态',
@@ -617,13 +644,6 @@ export default {
           dataIndex: 'status',
           width: 50,
           scopedSlots: { customRender: 'status' }
-        },
-        {
-          title: '主岗',
-          align: 'center',
-          dataIndex: 'isPrimary',
-          width: 50,
-          scopedSlots: { customRender: 'isPrimary' }
         },
         {
           title: '自动',
@@ -1118,31 +1138,33 @@ export default {
       this.listLoading = true
       updateUserStatus(row.id, status).then(() => {
         this.listLoading = false
-        row.status = status
         this.$message.success('状态修改成功')
+        this.handleTableRefresh()
       })
     },
     handleDownload () {
       this.downloadLoading = true
       import('@/vendor/Export2Excel').then(excel => {
         const tHeader = [
-          '序号',
           '账号',
           '姓名',
           '手机号',
           '邮箱',
+          '组织机构',
           '岗位',
+          '岗位类型',
           '性别',
           '注册时间',
           '状态'
         ]
         const filterVal = [
-          'id',
           'account',
           'realName',
           'mobile',
           'email',
+          'organizationName',
           'roleName',
+          'isPrimary',
           'gender',
           'createTime',
           'status'
@@ -1165,6 +1187,8 @@ export default {
             return this.$options.filters['genderNameFilter'](v[j])
           } else if (j === 'status') {
             return this.$options.filters['statusNameFilter'](v[j])
+          } else if (j === 'isPrimary') {
+            return this.$options.filters['roleFilter'](v[j])
           } else {
             return v[j]
           }

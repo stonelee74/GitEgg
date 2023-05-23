@@ -17,6 +17,7 @@
             <artifactId>gitegg-platform-base</artifactId>
             <version>${gitegg.project.version}</version>
         </dependency>
+
         <!-- Nacos 服务注册发现 -->
         <dependency>
             <groupId>com.alibaba.cloud</groupId>
@@ -93,6 +94,12 @@
         <dependency>
             <groupId>com.github.xiaoymin</groupId>
             <artifactId>knife4j-spring-ui</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.gitegg.cloud</groupId>
+            <artifactId>gitegg-common</artifactId>
+            <version>1.0.6_4.RELEASE</version>
+            <scope>compile</scope>
         </dependency>
     </dependencies>
 

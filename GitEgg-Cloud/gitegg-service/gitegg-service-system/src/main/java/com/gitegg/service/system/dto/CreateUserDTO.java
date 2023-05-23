@@ -95,6 +95,7 @@ public class CreateUserDTO implements Serializable {
     @ApiModelProperty(value = "组织机构id")
     private Long organizationId;
 
-    @ApiModelProperty(value = "用户角色id数组（多角色时）")
-    private List<Long> roleIds;
+    @ApiModelProperty("是否主岗（1:主岗 0:兼职）")
+    private Integer isPrimary;
+
 }

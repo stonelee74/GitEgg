@@ -166,8 +166,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
 
         // 如果为空时设置默认角色
         Long roleId = user.getRoleId();
-        List<Long> roleIds = user.getRoleIds();
-        if (null == roleId && CollectionUtils.isEmpty(roleIds)) {
+        if (null == roleId) {
             // 默认值，改成配置
             roleId = defaultRoleId;
         }
@@ -192,42 +191,20 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         PasswordEncoder passwordEncoder = PasswordEncoderFactories.createDelegatingPasswordEncoder();
         String cryptPwd = passwordEncoder.encode(AuthConstant.BCRYPT + userEntity.getAccount() + DigestUtils.md5DigestAsHex(pwd.getBytes()));
         userEntity.setPassword(cryptPwd);
+
         // 保存用户
         boolean result = this.save(userEntity);
         if (result) {
-
-            //保存用户和组织机构的关系
+            // 保存用户和组织机构的关系
             Long organizationId = null == user.getOrganizationId() ? defaultOrgId : user.getOrganizationId();
-            OrganizationUser organizationUser = new OrganizationUser();
-            organizationUser.setUserId(userEntity.getId());
-            organizationUser.setOrganizationId(organizationId);
-            organizationUserService.save(organizationUser);
+            OrganizationUser oUser = new OrganizationUser();
+            oUser.setUserId(userEntity.getId());
+            oUser.setOrganizationId(organizationId);
+            oUser.setRoleId(roleId);
+            oUser.setIsPrimary(user.getIsPrimary());
+            organizationUserService.save(oUser);
 
-            //默认增加用户所在机构数据权限值，但是否有操作权限还是会根据资源权限判断
-            DataPermissionUser dataPermission = new DataPermissionUser();
-            dataPermission.setUserId(userEntity.getId());
-            dataPermission.setOrganizationId(organizationId);
-            dataPermissionUserService.save(dataPermission);
-
-            //保存用户多个角色信息
-            List<UserRole> userRoleList = new ArrayList<>();
-            if (!CollectionUtils.isEmpty(roleIds)) {
-                for (Long role : roleIds) {
-                    UserRole userRole = new UserRole();
-                    userRole.setUserId(userEntity.getId());
-                    userRole.setRoleId(role);
-                    userRoleList.add(userRole);
-                }
-                userRoleService.saveBatch(userRoleList);
-            }
-
-            //保存用户单个角色信息
-            if (null != roleId) {
-                UserRole userRole = new UserRole();
-                userRole.setUserId(userEntity.getId());
-                userRole.setRoleId(roleId);
-                userRoleService.save(userRole);
-            }
+            // 返回 ID
             user.setId(userEntity.getId());
         }
         return user;
@@ -243,6 +220,16 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
     public boolean updateUser(UpdateUserDTO user) {
         Long orgUserId = user.getOrganizationUserId();
         Long userId = user.getId();
+        int isPrimary = user.getIsPrimary();
+
+        if (isPrimary == 1) {
+            // 如果本次设置的是主岗，则将其他岗位全部改为兼职
+            LambdaUpdateWrapper<OrganizationUser> uw = new LambdaUpdateWrapper<>();
+            uw.set(OrganizationUser::getIsPrimary, 0)
+                    .eq(OrganizationUser::getUserId, userId);
+            organizationUserService.update(uw);
+        }
+
         if (orgUserId != null) {
             OrganizationUser orgUser = organizationUserService.getById(orgUserId);
             if (orgUser == null) {
@@ -254,6 +241,17 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
             List<User> userList = userMapper.queryExistUser(userEntity);
             if (!CollectionUtils.isEmpty(userList)) {
                 throw new BusinessException("账号已经存在");
+            }
+
+            // 判断是否重复
+            LambdaQueryWrapper<OrganizationUser> qw = new LambdaQueryWrapper<>();
+            qw.eq(OrganizationUser::getOrganizationId, user.getOrganizationId())
+                    .ne(OrganizationUser::getId, orgUserId)
+                    .eq(OrganizationUser::getUserId, userEntity.getId())
+                    .eq(OrganizationUser::getRoleId, user.getRoleId());
+            // 如果这个角色不存在，则删除其他角色，保存这个角色
+            if (organizationUserService.count(qw) > 0) {
+                throw new BusinessException("岗位配置重复");
             }
 
             // 处理前端传过来的省市区
@@ -271,21 +269,18 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
                 String cryptPwd = passwordEncoder.encode(AuthConstant.BCRYPT + oldInfo.getAccount() + DigestUtils.md5DigestAsHex(pwd.getBytes()));
                 userEntity.setPassword(cryptPwd);
             }
+
+            // 保存用户信息
             boolean result = this.updateById(userEntity);
+            if (result) {
+                // 修改用户岗位信息
+                orgUser.setOrganizationId(user.getOrganizationId());
+                orgUser.setUserId(userEntity.getId());
+                orgUser.setRoleId(user.getRoleId());
+                orgUser.setIsPrimary(isPrimary);
 
-            // 修改用户岗位信息
-            orgUser.setOrganizationId(user.getOrganizationId());
-            orgUser.setUserId(userEntity.getId());
-            orgUser.setRoleId(user.getRoleId());
-            LambdaQueryWrapper<OrganizationUser> userRoleLambdaQueryWrapper = new LambdaQueryWrapper<>();
-            userRoleLambdaQueryWrapper.eq(OrganizationUser::getOrganizationId, user.getOrganizationId())
-                    .eq(OrganizationUser::getUserId, userEntity.getId())
-                    .eq(OrganizationUser::getRoleId, user.getRoleId());
-            List<OrganizationUser> urList = organizationUserService.list(userRoleLambdaQueryWrapper);
-
-            // 如果这个角色不存在，则删除其他角色，保存这个角色
-            if (CollectionUtils.isEmpty(urList)) {
-                organizationUserService.updateById(orgUser);
+                // 保存岗位信息
+                result = organizationUserService.updateById(orgUser);
             }
             return result;
         }
@@ -312,6 +307,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
             orgUser.setOrganizationId(user.getOrganizationId());
             orgUser.setUserId(userEntity.getId());
             orgUser.setRoleId(user.getRoleId());
+            orgUser.setIsPrimary(isPrimary);
 
             return organizationUserService.save(orgUser);
         }

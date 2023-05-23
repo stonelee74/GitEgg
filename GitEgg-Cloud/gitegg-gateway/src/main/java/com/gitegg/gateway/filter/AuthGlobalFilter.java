@@ -45,6 +45,7 @@ public class AuthGlobalFilter implements GlobalFilter, Ordered {
         String token = exchange.getRequest().getHeaders().getFirst(AuthConstant.JWT_TOKEN_HEADER);
 
         if (StrUtil.isEmpty(tenantId) && StrUtil.isEmpty(token)) {
+            // 缺少租户ID，且没有Token：放行
             return chain.filter(exchange);
         }
 

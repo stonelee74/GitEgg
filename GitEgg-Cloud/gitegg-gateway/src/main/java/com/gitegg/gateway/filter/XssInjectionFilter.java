@@ -3,7 +3,6 @@ package com.gitegg.gateway.filter;
 import com.gitegg.gateway.context.GatewayContext;
 import com.gitegg.gateway.option.FilterOrderEnum;
 import com.gitegg.gateway.properties.GatewayPluginProperties;
-import com.gitegg.gateway.util.SqlInjectionRuleUtils;
 import com.gitegg.gateway.util.WebfluxResponseUtils;
 import com.gitegg.gateway.util.XssInjectionRuleUtils;
 import lombok.AllArgsConstructor;

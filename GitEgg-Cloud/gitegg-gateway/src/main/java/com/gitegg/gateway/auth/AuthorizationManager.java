@@ -43,6 +43,9 @@ public class AuthorizationManager implements ReactiveAuthorizationManager<Author
 
     private final RedisTemplate redisTemplate;
 
+    /**
+     * oauth-list 全局配置
+     */
     private final AuthUrlWhiteListProperties authUrlWhiteListProperties;
 
     /**
@@ -54,8 +57,9 @@ public class AuthorizationManager implements ReactiveAuthorizationManager<Author
     @Override
     public Mono<AuthorizationDecision> check(Mono<Authentication> mono, AuthorizationContext authorizationContext) {
         ServerHttpRequest request = authorizationContext.getExchange().getRequest();
+
+        // 取得资源路径
         String path = request.getURI().getPath();
-        PathMatcher pathMatcher = new AntPathMatcher();
 
         // 对应跨域的预检请求直接放行
         if (request.getMethod() == HttpMethod.OPTIONS) {
@@ -76,7 +80,7 @@ public class AuthorizationManager implements ReactiveAuthorizationManager<Author
             return Mono.just(new AuthorizationDecision(true));
         }
 
-        //如果token被加入到黑名单，就是执行了退出登录操作，那么拒绝访问
+        // 如果token被加入到黑名单，就是执行了退出登录操作，那么拒绝访问
         String realToken = token.replace(AuthConstant.JWT_TOKEN_PREFIX, "");
         try {
             JWSObject jwsObject = JWSObject.parse(realToken);
@@ -99,6 +103,7 @@ public class AuthorizationManager implements ReactiveAuthorizationManager<Author
 
         // 需要鉴权但是每一个角色都需要的url，统一配置，不需要单个配置
         List<String> authUrls = authUrlWhiteListProperties.getAuthUrls();
+        PathMatcher pathMatcher = new AntPathMatcher();
         String urls = authUrls.stream().filter(url -> pathMatcher.match(url, path)).findAny().orElse(null);
 
         // 当配置了功能鉴权url时，直接放行，用户都有的功能，但是必须要登录才能用，例：退出登录功能是每个用户都有的权限，但是这个必须要登录才能够调用
