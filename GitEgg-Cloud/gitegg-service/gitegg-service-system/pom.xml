@@ -20,11 +20,17 @@
             <artifactId>gitegg-service-extension-client</artifactId>
             <version>${gitegg.project.version}</version>
         </dependency>
-        <!-- 验证码 -->
+
         <dependency>
-            <groupId>com.gitegg.platform</groupId>
-            <artifactId>gitegg-platform-captcha</artifactId>
+            <groupId>com.gitegg.cloud</groupId>
+            <artifactId>gitegg-platform</artifactId>
+            <version>${gitegg.project.version}</version>
         </dependency>
+<!--        &lt;!&ndash; 验证码 &ndash;&gt;-->
+<!--        <dependency>-->
+<!--            <groupId>com.gitegg.platform</groupId>-->
+<!--            <artifactId>gitegg-platform-captcha</artifactId>-->
+<!--        </dependency>-->
         <!-- 定时任务 -->
         <dependency>
             <groupId>com.gitegg.platform</groupId>
@@ -32,13 +38,153 @@
         </dependency>
     </dependencies>
 
-<!--    <build>-->
-<!--        <plugins>-->
+    <build>
+        <resources>
+            <resource>
+                <directory>src/main/java</directory>
+                <includes>
+                    <include>**/*.yml</include>
+                    <include>**/*.properties</include>
+                    <include>**/*.xml</include>
+                </includes>
+                <filtering>false</filtering>
+            </resource>
+            <resource>
+                <directory>src/main/resources</directory>
+                <includes>
+                    <include>**/*.yml</include>
+                    <include>**/*.properties</include>
+                    <include>**/*.xml</include>
+                    <include>**/*.drl</include>
+                    <include>**/*.ftl</include>
+                    <include>**/*.bpmn</include>
+                </includes>
+                <filtering>false</filtering>
+            </resource>
+            <resource>
+                <directory>${profiles.active}</directory>
+                <filtering>true</filtering>
+                <includes>
+                    <include>*.*</include>
+                </includes>
+            </resource>
+        </resources>
+
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.22.2</version>
+                <configuration>
+                    <!-- 跳过测试 -->
+                    <skipTests>true</skipTests>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <addClasspath>true</addClasspath>
+                            <!--   MANIFEST.MF 中 Class-Path -->
+                            <classpathPrefix>lib/</classpathPrefix>
+                            <mainClass>com.gitegg.service.system.GitEggSystemApplication</mainClass>
+                        </manifest>
+                    </archive>
+                </configuration>
+            </plugin>
+
+            <!-- 允许您打包可执行jar或war和运行应用程序 -->
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <!--                        <goals>
+                                                    &lt;!&ndash; 重新包装是可执行的jar或war &ndash;&gt;
+                                                    <goal>repackage</goal>
+                                                </goals>-->
+                        <configuration>
+                            <!-- 不加的话最终包名为: ${artifactId}-${version}.jar, 加了的话最终包名: ${artifactId}-${version}-${classifier}.jar  -->
+                            <classifier>execute</classifier>
+                            <!-- 不指定生成路径的话, 默认保存在 ${build.directory} 下 -->
+                            <outputDirectory>
+                                ${project.build.directory}/execute
+                            </outputDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
+<!--                <configuration>-->
+<!--                    <finalName>${project.artifactId}-${project.version}</finalName>-->
+<!--                    <layout>ZIP</layout>-->
+<!--                    <mainClass>${startClass}</mainClass>-->
+<!--                    <includes>-->
+<!--                        &lt;!&ndash; exclude ods part jar files &ndash;&gt;-->
+<!--                        <include>-->
+<!--                            <groupId>com.eiscloud</groupId>-->
+<!--                            <artifactId>accounting</artifactId>-->
+<!--                        </include>-->
+<!--                    </includes>-->
+
+<!--                    <excludes>-->
+<!--                        <exclude>-->
+<!--                            <groupId>org.projectlombok</groupId>-->
+<!--                            <artifactId>lombok</artifactId>-->
+<!--                        </exclude>-->
+<!--                    </excludes>-->
+<!--                </configuration>-->
+            </plugin>
+
+            <!-- 拷贝依赖的jar包到lib目录 -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>copy-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <!-- ${project.build.directory}是maven变量，内置的，表示target目录,如果不写，将在跟目录下创建/lib -->
+                            <outputDirectory>${project.build.directory}/lib</outputDirectory>
+                            <!-- excludeTransitive:是否不包含间接依赖包，比如我们依赖A，但是A又依赖了B，我们是否也要把B打进去 默认不打-->
+                            <excludeTransitive>false</excludeTransitive>
+                            <!-- 复制的jar文件去掉版本信息 -->
+                            <stripVersion>false</stripVersion>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- 设置源文件编码方式-->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.8.1</version>
+                <configuration>
+                    <source>1.8</source>
+                    <target>1.8</target>
+                    <encoding>UTF-8</encoding>
+
+                    <compilerArgs>
+                        <arg>-XDignore.symbol.file</arg>
+                    </compilerArgs>
+                    <fork>true</fork>
+                </configuration>
+            </plugin>
+
+            <!-- 解决资源文件的编码问题 -->
 <!--            <plugin>-->
-<!--                <groupId>com.google.cloud.tools</groupId>-->
-<!--                <artifactId>jib-maven-plugin</artifactId>-->
+<!--                <groupId>org.apache.maven.plugins</groupId>-->
+<!--                <artifactId>maven-resources-plugin</artifactId>-->
+<!--                <version>${maven-resources-plugin.version}</version>-->
+<!--                <configuration>-->
+<!--                    <encoding>UTF-8</encoding>-->
+<!--                </configuration>-->
 <!--            </plugin>-->
-<!--        </plugins>-->
-<!--    </build>-->
+        </plugins>
+    </build>
 
 </project>
