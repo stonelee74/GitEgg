@@ -1,0 +1,272 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.gitegg.platform</groupId>
+    <artifactId>gitegg-platform</artifactId>
+    <name>${project.artifactId}</name>
+    <description>GitEgg is a rapid development platform</description>
+    <url>https://github.com/wmz1930/gitegg-platform</url>
+    <version>1.0.6_5.RELEASE</version>
+    <packaging>pom</packaging>
+
+    <modules>
+        <module>gitegg-platform-base</module>
+        <module>gitegg-platform-bom</module>
+        <module>gitegg-platform-boot</module>
+        <module>gitegg-platform-cache</module>
+        <module>gitegg-platform-captcha</module>
+        <module>gitegg-platform-cloud</module>
+        <module>gitegg-platform-code-generator</module>
+        <module>gitegg-platform-db</module>
+        <module>gitegg-platform-dev</module>
+        <module>gitegg-platform-dfs</module>
+        <module>gitegg-platform-dfs-qiniu</module>
+        <module>gitegg-platform-dfs-minio</module>
+        <module>gitegg-platform-dfs-aliyun</module>
+        <module>gitegg-platform-dfs-starter</module>
+        <module>gitegg-platform-dfs-tencent</module>
+        <module>gitegg-platform-mybatis</module>
+        <module>gitegg-platform-oauth2</module>
+        <module>gitegg-platform-pay</module>
+        <module>gitegg-platform-push</module>
+        <module>gitegg-platform-sms</module>
+        <module>gitegg-platform-sms-aliyun</module>
+        <module>gitegg-platform-sms-tencent</module>
+        <module>gitegg-platform-sms-qiniu</module>
+        <module>gitegg-platform-sms-starter</module>
+        <module>gitegg-platform-swagger</module>
+        <module>gitegg-platform-wechat</module>
+        <module>gitegg-platform-log</module>
+        <module>gitegg-platform-justauth</module>
+        <module>gitegg-platform-xxl-job</module>
+        <module>gitegg-platform-mail</module>
+    </modules>
+
+    <properties>
+        <!-- jdk版本1.8 -->
+        <java.version>1.8</java.version>
+        <!-- maven-compiler-plugin插件版本，Java代码编译 -->
+        <maven.plugin.version>3.8.1</maven.plugin.version>
+        <!-- maven编译时指定编码UTF-8 -->
+        <maven.compiler.encoding>UTF-8</maven.compiler.encoding>
+        <!-- 项目统一字符集编码UTF-8 -->
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <!-- 项目统一字符集编码UTF-8 -->
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <!-- SpringBoot版本号 -->
+        <spring.boot.version>2.3.12.RELEASE</spring.boot.version>
+        <!-- SpringCloud版本号 -->
+        <spring.cloud.version>Hoxton.SR12</spring.cloud.version>
+    </properties>
+
+    <dependencies>
+        <!-- Lombok 通过简单注解消除冗长代码  -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+        </dependency>
+    </dependencies>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>com.gitegg.platform</groupId>
+                <artifactId>gitegg-platform-bom</artifactId>
+                <version>${project.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-dependencies</artifactId>
+                <version>${spring.boot.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-dependencies</artifactId>
+                <version>${spring.cloud.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <build>
+        <finalName>${project.name}</finalName>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+            </resource>
+            <resource>
+                <directory>src/main/java</directory>
+                <includes>
+                    <include>**/*.xml</include>
+                </includes>
+            </resource>
+        </resources>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>${maven.plugin.version}</version>
+                <configuration>
+                    <source>${java.version}</source>
+                    <target>${java.version}</target>
+                    <encoding>UTF-8</encoding>
+                    <compilerArgs>
+                        <arg>-parameters</arg>
+                    </compilerArgs>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+    <licenses>
+        <license>
+            <name>GNU General Public License v3.0</name>
+            <url>http://www.gnu.org/licenses/gpl-3.0.html</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+    <scm>
+        <tag>master</tag>
+        <url>git@github.com:wmz1930/gitegg-platform.git</url>
+        <connection>scm:git:git@github.com:wmz1930/gitegg-platform.git</connection>
+        <developerConnection>scm:git:git@github.com:wmz1930/gitegg-platform.git</developerConnection>
+    </scm>
+    <developers>
+        <developer>
+            <name>GitEgg</name>
+            <email>gitegg@gitegg.com</email>
+            <organization>GitEgg</organization>
+        </developer>
+    </developers>
+
+    <profiles>
+        <profile>
+            <id>release</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <build>
+                <plugins>
+                    <!--发布SNAPSHOT版本，发布release版本时，请使用下面的插件，这里注释掉
+                    <plugin>
+                        <groupId>org.sonatype.plugins</groupId>
+                        <artifactId>nexus-staging-maven-plugin</artifactId>
+                        <version>1.6.13</version>
+                        <extensions>true</extensions>
+                        <configuration>
+                            <serverId>ossrh</serverId>
+                            <nexusUrl>https://s01.oss.sonatype.org/</nexusUrl>
+                            <autoReleaseAfterClose>false</autoReleaseAfterClose>
+                            <stagingProgressPauseDurationSeconds>200000</stagingProgressPauseDurationSeconds>
+                            <stagingProgressTimeoutMinutes>20</stagingProgressTimeoutMinutes>
+                        </configuration>
+                    </plugin>-->
+                    <!--发布release版本-->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-release-plugin</artifactId>
+                        <version>2.5.3</version>
+                        <configuration>
+                            <autoVersionSubmodules>true</autoVersionSubmodules>
+                            <useReleaseProfile>false</useReleaseProfile>
+                            <releaseProfiles>release</releaseProfiles>
+                            <goals>deploy</goals>
+                        </configuration>
+                    </plugin>
+
+
+                    <!-- Source 生成源码插件-->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-source-plugin</artifactId>
+                        <version>2.2.1</version>
+                        <executions>
+                            <execution>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>jar-no-fork</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <!-- Javadoc 生成API文档插件-->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-javadoc-plugin</artifactId>
+                        <version>3.3.1</version>
+                        <executions>
+                            <execution>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>jar</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <!-- jdk1.8要加上，1.7要去掉，否则会报错 -->
+                            <additionalJOptions>
+                                <additionalJOption>-Xdoclint:none</additionalJOption>
+                            </additionalJOptions>
+                        </configuration>
+                    </plugin>
+                    <!-- GPG -->
+<!--                    <plugin>-->
+<!--                        <groupId>org.apache.maven.plugins</groupId>-->
+<!--                        <artifactId>maven-gpg-plugin</artifactId>-->
+<!--                        <version>3.0.1</version>-->
+<!--                        <executions>-->
+<!--                            <execution>-->
+<!--                                <phase>verify</phase>-->
+<!--                                <goals>-->
+<!--                                    <goal>sign</goal>-->
+<!--                                </goals>-->
+<!--                            </execution>-->
+<!--                        </executions>-->
+<!--                    </plugin>-->
+                    <!--Compiler-->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-compiler-plugin</artifactId>
+                        <version>3.0</version>
+                        <configuration>
+                            <source>1.8</source>
+                            <target>1.8</target>
+                            <fork>true</fork>
+                            <verbose>true</verbose>
+                            <encoding>UTF-8</encoding>
+                            <showWarnings>false</showWarnings>
+                        </configuration>
+                    </plugin>
+                    <!--versions-->
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>versions-maven-plugin</artifactId>
+                        <version>2.10.0</version>
+                    </plugin>
+                </plugins>
+            </build>
+
+            <distributionManagement>
+                <repository>
+                    <id>nexus-releases</id>
+                    <name>Internal Releases</name>
+                    <url>http://maven.yuntucredit.com.cn:9999/repository/releases/</url>
+                </repository>
+                <snapshotRepository>
+                    <id>nexus-snapshots</id>
+                    <name>Internal Releases</name>
+                    <url>http://maven.yuntucredit.com.cn:9999/repository/snapshots/</url>
+                </snapshotRepository>
+            </distributionManagement>
+        </profile>
+    </profiles>
+
+</project>
