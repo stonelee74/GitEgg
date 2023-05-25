@@ -16,7 +16,7 @@
     <artifactId>gitegg-platform-bom</artifactId>
     <name>${project.artifactId}</name>
     <packaging>pom</packaging>
-    <version>1.0.6_5.RELEASE</version>
+    <version>1.0.6_7.RELEASE</version>
 
     <properties>
         <!-- jdk版本1.8 -->
@@ -31,7 +31,7 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
         <!-- GitEgg项目统一设置版本号 -->
-        <gitegg.project.version>1.0.6_5.RELEASE</gitegg.project.version>
+        <gitegg.project.version>1.0.6_7.RELEASE</gitegg.project.version>
 
         <!-- mysql数据库驱动 -->
         <mysql.connector.version>8.0.17</mysql.connector.version>
@@ -542,34 +542,36 @@
         </dependencies>
     </dependencyManagement>
 
-    <build>
-        <plugins>
-            <!-- GPG -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-gpg-plugin</artifactId>
-                <version>3.0.1</version>
-                <executions>
-                    <execution>
-                        <phase>verify</phase>
-                        <goals>
-                            <goal>sign</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
-    </build>
+<!--    <build>-->
+<!--        <plugins>-->
+<!--            &lt;!&ndash; GPG &ndash;&gt;-->
+<!--            <plugin>-->
+<!--                <groupId>org.apache.maven.plugins</groupId>-->
+<!--                <artifactId>maven-gpg-plugin</artifactId>-->
+<!--                <version>3.0.1</version>-->
+<!--                <executions>-->
+<!--                    <execution>-->
+<!--                        <phase>verify</phase>-->
+<!--                        <goals>-->
+<!--                            <goal>sign</goal>-->
+<!--                        </goals>-->
+<!--                    </execution>-->
+<!--                </executions>-->
+<!--            </plugin>-->
+<!--        </plugins>-->
+<!--    </build>-->
 
     <distributionManagement>
-        <snapshotRepository>
-            <id>release</id>
-            <url>https://s01.oss.sonatype.org/content/repositories/snapshots</url>
-        </snapshotRepository>
         <repository>
-            <id>release</id>
-            <url>https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+            <id>nexus-releases</id>
+            <name>Internal Releases</name>
+            <url>http://maven.yuntucredit.com.cn:9999/repository/releases/</url>
         </repository>
+        <snapshotRepository>
+            <id>nexus-snapshots</id>
+            <name>Internal Releases</name>
+            <url>http://maven.yuntucredit.com.cn:9999/repository/snapshots/</url>
+        </snapshotRepository>
     </distributionManagement>
 
 </project>

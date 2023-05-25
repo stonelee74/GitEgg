@@ -6,12 +6,12 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.gitegg.platform.base.annotation.auth.CurrentUser;
+import com.gitegg.platform.base.annotation.auth.WebPermission;
 import com.gitegg.platform.base.annotation.resubmit.ResubmitLock;
 import com.gitegg.platform.base.constant.AuthConstant;
 import com.gitegg.platform.base.constant.GitEggConstant;
 import com.gitegg.platform.base.domain.GitEggUser;
 import com.gitegg.platform.base.dto.CheckExistDTO;
-import com.gitegg.platform.base.enums.ResultCodeEnum;
 import com.gitegg.platform.base.exception.BusinessException;
 import com.gitegg.platform.base.result.Result;
 import com.gitegg.service.system.bo.UserExportBO;
@@ -32,7 +32,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
-import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.util.CollectionUtils;
@@ -44,7 +43,6 @@ import springfox.documentation.annotations.ApiIgnore;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
-import java.io.IOException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
@@ -61,6 +59,7 @@ import java.util.List;
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 @Api(value = "UserController|用户相关的前端控制器", tags = {"用户配置"})
 @RefreshScope
+@WebPermission(label = "用户管理", auth = "查看")
 public class UserController {
 
     private final IUserService userService;
@@ -80,7 +79,7 @@ public class UserController {
             @ApiImplicitParam(name = "status", value = "用户状态", required = false, dataTypeClass = Integer.class, paramType = "query"),
             @ApiImplicitParam(name = "size", value = "每页条数", required = false, dataTypeClass = Integer.class, paramType = "query"),
             @ApiImplicitParam(name = "current", value = "当前页", required = false, dataTypeClass = Integer.class, paramType = "query") })
-//    @ResubmitLock(interval = 1, argsIndex = {0}, ignoreKeys = {"email","status"})
+    @WebPermission(label = "列表", auth = "查看")
     public Result<Page<UserInfo>> list( @ApiIgnore QueryUserDTO user, @ApiIgnore Page<UserInfo> page) {
         Page<UserInfo> pageUser = userService.queryUserPage(page, user);
         return Result.data(pageUser);
@@ -89,6 +88,7 @@ public class UserController {
 
     @GetMapping("/simpleList")
     @ApiOperation(value = "查询用户列表")
+    @WebPermission(label = "查询用户列表", auth = "查看")
     public Result<List<User>> simpleList(@ApiIgnore QueryUserDTO user) {
         LambdaQueryWrapper<User> qw = new LambdaQueryWrapper<>();
         qw.select(User::getId, User::getAccount, User::getNickname, User::getRealName);
@@ -102,6 +102,7 @@ public class UserController {
     @PostMapping("/create")
     @ApiOperation(value = "添加用户")
     @ResubmitLock(interval = 5)
+    @WebPermission(label = "添加用户", auth = "添加")
     public Result<?> create(@RequestBody @Valid CreateUserDTO user) {
         CreateUserDTO userDTO = userService.createUser(user);
         return Result.data(userDTO.getId());
@@ -113,6 +114,7 @@ public class UserController {
     @PostMapping("/addOld")
     @ApiOperation(value = "添加用户")
     @ResubmitLock(interval = 5)
+    @WebPermission(label = "添加用户", auth = "添加")
     public Result<?> add(@RequestBody @Valid CreateUserDTO user) {
         CreateUserDTO userDTO = userService.createUser(user);
         return Result.data(userDTO.getId());
@@ -123,6 +125,7 @@ public class UserController {
      */
     @PostMapping("/update")
     @ApiOperation(value = "更新用户信息")
+    @WebPermission(label = "更新用户信息", auth = "编辑")
     public Result<?> update(@RequestBody UpdateUserDTO user) {
         boolean result = userService.updateUser(user);
         return Result.result(result);
@@ -134,6 +137,7 @@ public class UserController {
     @PostMapping("/delete/{userId}")
     @ApiOperation(value = "删除用户")
     @ApiImplicitParam(paramType = "path", name = "userId", value = "用户ID", required = true, dataTypeClass = Long.class)
+    @WebPermission(label = "删除用户", auth = "删除")
     public Result<?> delete(@PathVariable("userId") Long userId) {
         if (null == userId) {
             return Result.error("用户ID不能为空");
@@ -148,6 +152,7 @@ public class UserController {
     @PostMapping("/batch/delete")
     @ApiOperation(value = "批量删除用户")
     @ApiImplicitParam(name = "userIds", value = "用户ID列表", required = true, dataTypeClass = List.class)
+    @WebPermission(label = "批量删除用户", auth = "删除")
     public Result<?> batchDelete(@RequestBody List<Long> userIds) {
         if (CollectionUtils.isEmpty(userIds)) {
             return Result.error("用户ID列表不能为空");
@@ -161,6 +166,7 @@ public class UserController {
      */
     @PostMapping("/password/change")
     @ApiOperation(value = "用户修改密码")
+    @WebPermission(label = "用户修改密码", auth = "编辑")
     public Result<?> updatePassword(@RequestBody UpdateUserDTO userUpdate, @ApiIgnore @CurrentUser GitEggUser currentUser) {
         String newPwd = userUpdate.getNewPwd();
         String oldPwd = userUpdate.getOldPwd();
@@ -186,6 +192,7 @@ public class UserController {
     @PostMapping("password/reset/{userId}")
     @ApiOperation(value = "管理员重置用户密码")
     @ApiImplicitParam(paramType = "path", name = "userId", value = "用户ID", required = true, dataTypeClass = Long.class)
+    @WebPermission(label = "管理员重置用户密码", auth = "编辑")
     public Result<?> resetPassword(@PathVariable("userId") Long userId) {
         if (null == userId) {
             return Result.error("用户ID不能为空");
@@ -202,6 +209,7 @@ public class UserController {
     @ApiImplicitParams({
             @ApiImplicitParam(name = "userId", value = "用户ID", required = true, dataTypeClass = Long.class, paramType = "path"),
             @ApiImplicitParam(name = "status", value = "用户状态", required = true, dataTypeClass = Integer.class, paramType = "path")})
+    @WebPermission(label = "管理员修改用户状态", auth = "编辑")
     public Result<?> updateStatus(@PathVariable("userId") Long userId, @PathVariable("status") Integer status) {
         boolean result = userService.updateUserStatus(userId, status);
         return Result.result(result);
@@ -212,6 +220,7 @@ public class UserController {
      */
     @PostMapping("/update/info")
     @ApiOperation(value = "用户修改个人信息")
+    @WebPermission(label = "用户修改个人信息", auth = "编辑")
     public Result<?> updateInfo(@RequestBody UpdateUserDTO user, @ApiIgnore User tempUser) {
         UpdateUserDTO upUser = new UpdateUserDTO();
         upUser.setAvatar(user.getAvatar());
@@ -228,6 +237,7 @@ public class UserController {
      */
     @PostMapping("/update/organization/data/permission")
     @ApiOperation(value = "更新用户数据权限")
+    @WebPermission(label = "列表", auth = "查看")
     public Result<?> updateUserDataPermission(@Valid @RequestBody UpdateDataPermissionUserDTO updateDataPermission) {
         boolean result = dataPermissionUserService.updateUserOrganizationDataPermission(updateDataPermission);
         return Result.result(result);
@@ -241,6 +251,7 @@ public class UserController {
      */
     @PostMapping(value = "/check")
     @ApiOperation(value = "校验用户账号是否存在", notes = "校验用户账号是否存在")
+    @WebPermission(label = "校验用户账号是否存在", auth = "查看")
     public Result<Boolean> checkUserExist(@RequestBody CheckExistDTO user) {
         String field = user.getCheckField();
         String value = user.getCheckValue();
@@ -259,6 +270,7 @@ public class UserController {
      */
     @GetMapping("/download/template")
     @ApiOperation("导出上传模板")
+    @WebPermission(label = "导出上传模板", auth = "导出")
     public void downloadTemplate(HttpServletResponse response) {
         response.setContentType("application/vnd.ms-excel");
         response.setCharacterEncoding("utf-8");
@@ -282,6 +294,7 @@ public class UserController {
      */
     @PostMapping("/export")
     @ApiOperation("导出数据")
+    @WebPermission(label = "导出数据", auth = "导出")
     public void exportUserList(HttpServletResponse response, @RequestBody QueryUserDTO queryUserDTO) {
         response.setContentType("application/vnd.ms-excel");
         response.setCharacterEncoding("utf-8");
@@ -307,6 +320,7 @@ public class UserController {
      */
     @PostMapping("/import")
     @ApiOperation("批量上传数据")
+    @WebPermission(label = "批量上传数据", auth = "导入")
     public Result<?> importUserList(@RequestParam("uploadFile") MultipartFile file) {
         boolean importSuccess = userService.importUserList(file);
         return Result.result(importSuccess);
@@ -317,6 +331,7 @@ public class UserController {
      */
     @GetMapping("/organization/data/permission/list")
     @ApiOperation(value = "分页查询机构权限下的用户列表")
+    @WebPermission(label = "列表", auth = "查看")
     public Result<Page<UserInfo>> organizationDataUserList(@ApiIgnore QueryUserDTO user, @ApiIgnore Page<UserInfo> page) {
         if(null == user.getOrganizationId())
         {
@@ -332,6 +347,7 @@ public class UserController {
     @PostMapping("/organization/data/permission/batch/delete")
     @ApiOperation(value = "批量删除机构下的用户权限关系")
     @ApiImplicitParam(name = "dataPermissionUserIds", value = "ID列表", required = true, dataTypeClass = List.class)
+    @WebPermission(label = "列表", auth = "查看")
     public Result<?> organizationDataUserBatchDelete(@RequestBody List<Long> dataPermissionUserIds) {
         if (CollectionUtils.isEmpty(dataPermissionUserIds)) {
             return Result.error("ID列表不能为空");
