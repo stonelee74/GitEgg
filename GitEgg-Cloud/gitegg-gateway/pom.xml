@@ -114,34 +114,42 @@
 
 
     <build>
+<!--        <resources>-->
+<!--            <resource>-->
+<!--                <directory>src/main/java</directory>-->
+<!--                <includes>-->
+<!--                    <include>**/*.yml</include>-->
+<!--                    <include>**/*.properties</include>-->
+<!--                    <include>**/*.xml</include>-->
+<!--                </includes>-->
+<!--                <filtering>false</filtering>-->
+<!--            </resource>-->
+<!--            <resource>-->
+<!--                <directory>src/main/resources</directory>-->
+<!--                <includes>-->
+<!--                    <include>**/*.yml</include>-->
+<!--                    <include>**/*.properties</include>-->
+<!--                    <include>**/*.xml</include>-->
+<!--                    <include>**/*.drl</include>-->
+<!--                    <include>**/*.ftl</include>-->
+<!--                    <include>**/*.bpmn</include>-->
+<!--                </includes>-->
+<!--                <filtering>false</filtering>-->
+<!--            </resource>-->
+<!--            <resource>-->
+<!--                <directory>${profiles.active}</directory>-->
+<!--                <filtering>true</filtering>-->
+<!--                <includes>-->
+<!--                    <include>*.*</include>-->
+<!--                </includes>-->
+<!--            </resource>-->
+<!--        </resources>-->
+
         <resources>
             <resource>
-                <directory>src/main/java</directory>
-                <includes>
-                    <include>**/*.yml</include>
-                    <include>**/*.properties</include>
-                    <include>**/*.xml</include>
-                </includes>
-                <filtering>false</filtering>
-            </resource>
-            <resource>
                 <directory>src/main/resources</directory>
-                <includes>
-                    <include>**/*.yml</include>
-                    <include>**/*.properties</include>
-                    <include>**/*.xml</include>
-                    <include>**/*.drl</include>
-                    <include>**/*.ftl</include>
-                    <include>**/*.bpmn</include>
-                </includes>
-                <filtering>false</filtering>
-            </resource>
-            <resource>
-                <directory>${profiles.active}</directory>
+                <!--解决找不到@profile.name@-->
                 <filtering>true</filtering>
-                <includes>
-                    <include>*.*</include>
-                </includes>
             </resource>
         </resources>
 
