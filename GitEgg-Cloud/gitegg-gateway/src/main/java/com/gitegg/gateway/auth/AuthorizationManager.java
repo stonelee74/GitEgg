@@ -1,14 +1,19 @@
 package com.gitegg.gateway.auth;
 
 import cn.hutool.core.convert.Convert;
+import cn.hutool.json.JSONObject;
+import cn.hutool.json.JSONUtil;
 import com.gitegg.platform.base.constant.AuthConstant;
+import com.gitegg.platform.base.constant.RedisConstant;
 import com.gitegg.platform.base.constant.TokenConstant;
+import com.gitegg.platform.base.permission.ActionPO;
+import com.gitegg.platform.base.permission.ControllerPO;
+import com.gitegg.platform.base.util.MyObjectUtil;
 import com.gitegg.platform.oauth2.props.AuthUrlWhiteListProperties;
 import com.nimbusds.jose.JWSObject;
 import com.nimbusds.jose.Payload;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import net.minidev.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -27,10 +32,7 @@ import org.springframework.util.StringUtils;
 import reactor.core.publisher.Mono;
 
 import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 网关鉴权管理器
@@ -48,6 +50,11 @@ public class AuthorizationManager implements ReactiveAuthorizationManager<Author
      */
     private final AuthUrlWhiteListProperties authUrlWhiteListProperties;
 
+    private static boolean reload = false;
+
+    private static HashMap<String, String> controllerMap = new HashMap<>();
+    private static HashMap<String, String> actionMap = new HashMap<>();
+
     /**
      * 是否开启租户模式
      */
@@ -57,6 +64,37 @@ public class AuthorizationManager implements ReactiveAuthorizationManager<Author
     @Override
     public Mono<AuthorizationDecision> check(Mono<Authentication> mono, AuthorizationContext authorizationContext) {
         ServerHttpRequest request = authorizationContext.getExchange().getRequest();
+
+        // 取得是否重新加载权限数据标志
+        reload = MyObjectUtil.getBoolean(redisTemplate.opsForValue().get("__GITEGG_RELOAD_PERMISSION__"));
+        if (reload || controllerMap.size() < 1) {
+            // 重新加载
+            log.info("重新加载授权数据");
+            String json = MyObjectUtil.getString(redisTemplate.opsForValue().get(RedisConstant.PERMISSION_KEY));
+            if (!StringUtils.isEmpty(json)) {
+                JSONObject cMap = JSONUtil.parseObj(json);
+                // 遍历所有控制器
+                for (Map.Entry<String, Object> entry: cMap.entrySet()) {
+                    Object obj = entry.getValue();
+                    if (obj instanceof ControllerPO) {
+                        ControllerPO po = (ControllerPO)obj;
+                        String path = po.getPath();
+
+                        // 遍历控制器所有方法
+                        HashMap<String, ActionPO> actions = po.getActionPOs();
+                        for (Map.Entry<String, ActionPO> entry1: actions.entrySet()) {
+                            ActionPO apo = entry1.getValue();
+                            // 记录 URL 对应控制器及所需授权
+                            this.controllerMap.put(path + apo.getPath(), po.getCode());
+                            this.actionMap.put(path + apo.getPath(), apo.getAuth());
+                            log.info("{} 对应控制权限：{} -- {}", path + apo.getPath(), po.getCode(), apo.getAuth());
+                        }
+                    }
+                }
+            }
+
+            redisTemplate.opsForValue().set("__GITEGG_RELOAD_PERMISSION__", false);
+        }
 
         // 取得资源路径
         String path = request.getURI().getPath();
@@ -85,8 +123,8 @@ public class AuthorizationManager implements ReactiveAuthorizationManager<Author
         try {
             JWSObject jwsObject = JWSObject.parse(realToken);
             Payload payload = jwsObject.getPayload();
-            JSONObject jsonObject = payload.toJSONObject();
-            String jti = jsonObject.getAsString(TokenConstant.JTI);
+            JSONObject jsonObject = JSONUtil.parseObj(payload.toString());
+            String jti = jsonObject.getStr(TokenConstant.JTI);
             String blackListToken = (String)redisTemplate.opsForValue().get(AuthConstant.TOKEN_BLACKLIST + jti);
             if (!StringUtils.isEmpty(blackListToken)) {
                 return Mono.just(new AuthorizationDecision(false));

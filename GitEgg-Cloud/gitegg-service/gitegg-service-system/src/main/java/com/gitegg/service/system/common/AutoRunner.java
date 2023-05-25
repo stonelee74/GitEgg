@@ -2,6 +2,7 @@ package com.gitegg.service.system.common;
 
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
+import com.gitegg.platform.base.constant.RedisConstant;
 import com.gitegg.platform.base.permission.ActionPO;
 import com.gitegg.platform.base.permission.ControllerPO;
 import com.gitegg.platform.base.util.MyObjectUtil;
@@ -19,8 +20,7 @@ import java.util.Map;
  */
 @Component
 public class AutoRunner implements CommandLineRunner {
-
-    final static String REDIS_KEY = "__GITEGG_CLOUD_ControllerMap__";
+    final static String SYS_CODE = "SYSTEM";
 
     @Autowired
     private PermissionManager manager;
@@ -39,7 +39,7 @@ public class AutoRunner implements CommandLineRunner {
     private RedisTemplate redisTemplate;
 
     private void updateControllerList() {
-        String json = MyObjectUtil.getString(redisTemplate.opsForValue().get(REDIS_KEY));
+        String json = MyObjectUtil.getString(redisTemplate.opsForValue().get(RedisConstant.PERMISSION_KEY));
         JSONObject controllerJson;
         if (MyStringUtils.isNoneEmpty(json)) {
             controllerJson = JSONUtil.parseObj(json);
@@ -58,7 +58,7 @@ public class AutoRunner implements CommandLineRunner {
             m.put("code", v.getCode());
             m.put("auth", v.getAuth());
             m.put("path", v.getPath());
-            m.put("sys", "POSTLOAN");
+            m.put("sys", SYS_CODE);
 
             HashMap<String, ActionPO> pos = v.getActionPOs();
             HashMap<String, Map> actions = new HashMap<>();
@@ -69,14 +69,15 @@ public class AutoRunner implements CommandLineRunner {
                 act.put("name", po.getName());
                 act.put("code", po.getCode());
                 act.put("auth", po.getAuth());
+                act.put("path", po.getPath());
                 actions.put(en1.getKey(), act);
             }
             m.put("actions", actions);
 
-            controllerJson.put(en.getKey(), m);
+            controllerJson.set(en.getKey(), m);
         }
 
-        redisTemplate.opsForValue().set(REDIS_KEY, controllerJson.toString());
+        redisTemplate.opsForValue().set(RedisConstant.PERMISSION_KEY, controllerJson.toString());
         MyStringUtils.printJson(controllerJson);
         System.out.println("=========== 保存完毕 ===========");
     }

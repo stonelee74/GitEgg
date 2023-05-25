@@ -8,6 +8,7 @@ package com.gitegg.platform.base.util;
 
 import cn.hutool.json.JSONObject;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.springframework.stereotype.Component;
 
@@ -34,7 +35,7 @@ import java.util.regex.Pattern;
 
 @Slf4j
 @Component
-public class MyStringUtils extends org.apache.commons.lang3.StringUtils {
+public class MyStringUtils extends StringUtils {
 
     private static final char _SEPARATOR = '_';
     private static final String CHARSET_NAME = "UTF-8";

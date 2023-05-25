@@ -34,23 +34,23 @@ public class PermissionManager implements ResourceLoaderAware {
 
     private HashMap<String, ControllerPO> controllers = new HashMap<String, ControllerPO>();
 
-    private HashMap<String, ControllerPO> urlmapping = new HashMap<String, ControllerPO>();
-
+//    private HashMap<String, ControllerPO> urlmapping = new HashMap<String, ControllerPO>();
+//
     public HashMap<String, ControllerPO> getControllers() {
         return controllers;
     }
-
-    public HashMap<String, ControllerPO> getUrlMapping() {
-        return this.urlmapping;
-    }
-
-    public void setControllers(HashMap<String, ControllerPO> controllers) {
-        this.controllers = controllers;
-    }
-
-    public ControllerPO getController(String controllerName) {
-        return controllers.get(controllerName);
-    }
+//
+//    public HashMap<String, ControllerPO> getUrlMapping() {
+//        return this.urlmapping;
+//    }
+//
+//    public void setControllers(HashMap<String, ControllerPO> controllers) {
+//        this.controllers = controllers;
+//    }
+//
+//    public ControllerPO getController(String controllerName) {
+//        return controllers.get(controllerName);
+//    }
 
     private ResourceLoader resourceLoader;
 
@@ -88,17 +88,17 @@ public class PermissionManager implements ResourceLoaderAware {
         return classList;
     }
 
-    /**
-     * 返回控制器权限列表
-     *
-     * @param controllerName
-     * @return
-     */
-    public Set<String> getActionList(String controllerName) {
-        ControllerPO po = controllers.get(controllerName);
-        if (po == null) return new HashSet<>();
-        return po.getActionList();
-    }
+//    /**
+//     * 返回控制器权限列表
+//     *
+//     * @param controllerName
+//     * @return
+//     */
+//    public Set<String> getActionList(String controllerName) {
+//        ControllerPO po = controllers.get(controllerName);
+//        if (po == null) return new HashSet<>();
+//        return po.getActionList();
+//    }
 
     public void init() throws Exception {
         List<Class> list = getControllerList();
@@ -169,9 +169,9 @@ public class PermissionManager implements ResourceLoaderAware {
                 routeController.addActionPO(mt.getName(), routeAction);
             }
             controllers.put(controllerCode, routeController);
-            for (String url : rm.path()) {
-                urlmapping.put(url, routeController);
-            }
+//            for (String url : rm.path()) {
+//                urlmapping.put(url, routeController);
+//            }
         }
     }
 }
