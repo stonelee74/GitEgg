@@ -38,7 +38,7 @@ import lombok.RequiredArgsConstructor;
 * @since 2021-05-13
 */
 @RestController
-@RequestMapping("/data/permission/role")
+@RequestMapping("data/permission/role")
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 @Api(value = "DataPermissionRoleController|数据权限配置表前端控制器", tags = {"数据权限配置"})
 @RefreshScope

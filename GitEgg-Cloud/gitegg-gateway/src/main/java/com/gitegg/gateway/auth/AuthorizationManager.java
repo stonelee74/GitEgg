@@ -43,14 +43,30 @@ import java.util.*;
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 public class AuthorizationManager implements ReactiveAuthorizationManager<AuthorizationContext> {
 
+    /**
+     * 路由对应的控制器代码和所需授权
+     */
+    class CA {
+        String controller;
+        String auth;
+    }
+
     private final RedisTemplate redisTemplate;
 
     /**
      * oauth-list 全局配置
      */
     private final AuthUrlWhiteListProperties authUrlWhiteListProperties;
-    private static HashMap<String, String> controllerMap = new HashMap<>();
-    private static HashMap<String, String> actionMap = new HashMap<>();
+
+    /**
+     * 完全匹配的路由权限
+     */
+    private static HashMap<String, CA> routeMap = new HashMap<>();
+
+    /**
+     * 按前缀匹配的路由权限
+     */
+    private static HashMap<String, CA> prefixMap = new HashMap<>();
 
     /**
      * 是否开启租户模式
@@ -64,7 +80,7 @@ public class AuthorizationManager implements ReactiveAuthorizationManager<Author
 
         // 取得是否重新加载权限数据标志
         boolean reload = MyObjectUtil.getBoolean(redisTemplate.opsForValue().get(RedisConstant.PERMISSION_RELOAD_KEY));
-        if (reload || controllerMap.size() < 1) {
+        if (reload || routeMap.size() < 1) {
             // 重新加载
             log.info("重新加载授权数据");
             String json = MyObjectUtil.getString(redisTemplate.opsForValue().get(RedisConstant.PERMISSION_KEY));
@@ -85,11 +101,15 @@ public class AuthorizationManager implements ReactiveAuthorizationManager<Author
                                 JSONObject apo = (JSONObject)obj1;
                                 // 记录 URL 对应控制器及所需授权
                                 String path1 = path + apo.getStr("path");
-                                String code = po.getStr("code");
-                                String auth = apo.getStr("auth");
-                                this.controllerMap.put(path1, code);
-                                this.actionMap.put(path1, auth);
-                                log.info("{} 对应控制权限：{} -- {}", path1, code, auth);
+                                CA ca = new CA();
+                                ca.controller = po.getStr("code");
+                                ca.auth = apo.getStr("auth");
+                                if (apo.getBool("prefix", false)) {
+                                    routeMap.put(path1, ca);
+                                } else {
+                                    prefixMap.put(path1, ca);
+                                }
+                                log.info("{} 对应控制权限：{} -- {}", path1, ca.controller, ca.auth);
                             }
                         }
                     }

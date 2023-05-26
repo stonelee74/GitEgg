@@ -32,6 +32,7 @@ import java.util.*;
 public class PermissionManager implements ResourceLoaderAware {
 
     public static final String PROJECT_PACKAGE = "com.gitegg";
+    public static final String PROJECT_ROOT = "/gitegg-service-system/";
 
     private HashMap<String, ControllerPO> controllers = new HashMap<String, ControllerPO>();
 
@@ -140,7 +141,7 @@ public class PermissionManager implements ResourceLoaderAware {
             routeController.setId(controllerCode);
             routeController.setName(ca.label());
             routeController.setAuth(ca.auth());
-            routeController.setPath(path);
+            routeController.setPath(PROJECT_ROOT + path);
 
             // 创建动作PO
             Method[] cmethods = controller.getMethods();
