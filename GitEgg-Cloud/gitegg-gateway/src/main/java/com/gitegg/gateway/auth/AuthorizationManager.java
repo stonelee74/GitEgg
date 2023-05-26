@@ -74,6 +74,46 @@ public class AuthorizationManager implements ReactiveAuthorizationManager<Author
     @Value("${tenant.enable}")
     private Boolean enable;
 
+
+    synchronized private void reloadPeimissionData() {
+        // 重新加载
+        log.info("重新加载授权数据");
+        String json = MyObjectUtil.getString(redisTemplate.opsForValue().get(RedisConstant.PERMISSION_KEY));
+        if (!StringUtils.isEmpty(json)) {
+            JSONObject cMap = JSONUtil.parseObj(json);
+            // 遍历所有控制器
+            for (Map.Entry<String, Object> entry: cMap.entrySet()) {
+                Object obj = entry.getValue();
+                if (obj instanceof JSONObject) {
+                    JSONObject po = (JSONObject)obj;
+                    String path = po.getStr("path");
+
+                    // 遍历控制器所有方法
+                    JSONObject actions = po.getJSONObject("actions");
+                    for (Map.Entry<String, Object> entry1: actions.entrySet()) {
+                        Object obj1  = entry1.getValue();
+                        if (obj1 instanceof JSONObject) {
+                            JSONObject apo = (JSONObject)obj1;
+                            // 记录 URL 对应控制器及所需授权
+                            String path1 = path + apo.getStr("path");
+                            CA ca = new CA();
+                            ca.controller = po.getStr("code");
+                            ca.auth = apo.getStr("auth");
+                            if (apo.getBool("prefix", false)) {
+                                routeMap.put(path1, ca);
+                            } else {
+                                prefixMap.put(path1, ca);
+                            }
+                            log.info("{} 对应控制权限：{} -- {}", path1, ca.controller, ca.auth);
+                        }
+                    }
+                }
+            }
+        }
+
+        redisTemplate.opsForValue().set(RedisConstant.PERMISSION_RELOAD_KEY, false);
+    }
+
     @Override
     public Mono<AuthorizationDecision> check(Mono<Authentication> mono, AuthorizationContext authorizationContext) {
         ServerHttpRequest request = authorizationContext.getExchange().getRequest();
@@ -81,42 +121,7 @@ public class AuthorizationManager implements ReactiveAuthorizationManager<Author
         // 取得是否重新加载权限数据标志
         boolean reload = MyObjectUtil.getBoolean(redisTemplate.opsForValue().get(RedisConstant.PERMISSION_RELOAD_KEY));
         if (reload || routeMap.size() < 1) {
-            // 重新加载
-            log.info("重新加载授权数据");
-            String json = MyObjectUtil.getString(redisTemplate.opsForValue().get(RedisConstant.PERMISSION_KEY));
-            if (!StringUtils.isEmpty(json)) {
-                JSONObject cMap = JSONUtil.parseObj(json);
-                // 遍历所有控制器
-                for (Map.Entry<String, Object> entry: cMap.entrySet()) {
-                    Object obj = entry.getValue();
-                    if (obj instanceof JSONObject) {
-                        JSONObject po = (JSONObject)obj;
-                        String path = po.getStr("path");
-
-                        // 遍历控制器所有方法
-                        JSONObject actions = po.getJSONObject("actions");
-                        for (Map.Entry<String, Object> entry1: actions.entrySet()) {
-                            Object obj1  = entry1.getValue();
-                            if (obj1 instanceof JSONObject) {
-                                JSONObject apo = (JSONObject)obj1;
-                                // 记录 URL 对应控制器及所需授权
-                                String path1 = path + apo.getStr("path");
-                                CA ca = new CA();
-                                ca.controller = po.getStr("code");
-                                ca.auth = apo.getStr("auth");
-                                if (apo.getBool("prefix", false)) {
-                                    routeMap.put(path1, ca);
-                                } else {
-                                    prefixMap.put(path1, ca);
-                                }
-                                log.info("{} 对应控制权限：{} -- {}", path1, ca.controller, ca.auth);
-                            }
-                        }
-                    }
-                }
-            }
-
-            redisTemplate.opsForValue().set(RedisConstant.PERMISSION_RELOAD_KEY, false);
+            reloadPeimissionData();
         }
 
         // 取得资源路径
@@ -180,6 +185,20 @@ public class AuthorizationManager implements ReactiveAuthorizationManager<Author
             redisRoleKey += tenantId;
         } else {
             redisRoleKey = AuthConstant.RESOURCE_ROLES_KEY;
+        }
+
+        // 匹配访问路径
+        CA ca = routeMap.get(path);
+        if (ca == null) {
+            for (Map.Entry<String, CA> entry : prefixMap.entrySet()) {
+                if (path.startsWith(entry.getKey())) {
+                    ca = entry.getValue();
+                }
+            };
+        }
+
+        if (ca != null) {
+            log.info("访问：{} 需要权限 {} -- {}", path, ca.controller, ca.auth);
         }
 
         // 缓存取资源权限角色关系列表
