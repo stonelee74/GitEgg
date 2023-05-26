@@ -49,9 +49,6 @@ public class AuthorizationManager implements ReactiveAuthorizationManager<Author
      * oauth-list 全局配置
      */
     private final AuthUrlWhiteListProperties authUrlWhiteListProperties;
-
-    private static boolean reload = false;
-
     private static HashMap<String, String> controllerMap = new HashMap<>();
     private static HashMap<String, String> actionMap = new HashMap<>();
 
@@ -66,7 +63,7 @@ public class AuthorizationManager implements ReactiveAuthorizationManager<Author
         ServerHttpRequest request = authorizationContext.getExchange().getRequest();
 
         // 取得是否重新加载权限数据标志
-        reload = MyObjectUtil.getBoolean(redisTemplate.opsForValue().get("__GITEGG_RELOAD_PERMISSION__"));
+        boolean reload = MyObjectUtil.getBoolean(redisTemplate.opsForValue().get(RedisConstant.PERMISSION_RELOAD_KEY));
         if (reload || controllerMap.size() < 1) {
             // 重新加载
             log.info("重新加载授权数据");
@@ -76,24 +73,30 @@ public class AuthorizationManager implements ReactiveAuthorizationManager<Author
                 // 遍历所有控制器
                 for (Map.Entry<String, Object> entry: cMap.entrySet()) {
                     Object obj = entry.getValue();
-                    if (obj instanceof ControllerPO) {
-                        ControllerPO po = (ControllerPO)obj;
-                        String path = po.getPath();
+                    if (obj instanceof JSONObject) {
+                        JSONObject po = (JSONObject)obj;
+                        String path = po.getStr("path");
 
                         // 遍历控制器所有方法
-                        HashMap<String, ActionPO> actions = po.getActionPOs();
-                        for (Map.Entry<String, ActionPO> entry1: actions.entrySet()) {
-                            ActionPO apo = entry1.getValue();
-                            // 记录 URL 对应控制器及所需授权
-                            this.controllerMap.put(path + apo.getPath(), po.getCode());
-                            this.actionMap.put(path + apo.getPath(), apo.getAuth());
-                            log.info("{} 对应控制权限：{} -- {}", path + apo.getPath(), po.getCode(), apo.getAuth());
+                        JSONObject actions = po.getJSONObject("actions");
+                        for (Map.Entry<String, Object> entry1: actions.entrySet()) {
+                            Object obj1  = entry1.getValue();
+                            if (obj1 instanceof JSONObject) {
+                                JSONObject apo = (JSONObject)obj1;
+                                // 记录 URL 对应控制器及所需授权
+                                String path1 = path + apo.getStr("path");
+                                String code = po.getStr("code");
+                                String auth = apo.getStr("auth");
+                                this.controllerMap.put(path1, code);
+                                this.actionMap.put(path1, auth);
+                                log.info("{} 对应控制权限：{} -- {}", path1, code, auth);
+                            }
                         }
                     }
                 }
             }
 
-            redisTemplate.opsForValue().set("__GITEGG_RELOAD_PERMISSION__", false);
+            redisTemplate.opsForValue().set(RedisConstant.PERMISSION_RELOAD_KEY, false);
         }
 
         // 取得资源路径

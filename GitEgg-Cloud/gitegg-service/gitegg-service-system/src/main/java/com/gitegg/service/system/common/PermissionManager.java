@@ -16,6 +16,7 @@ import org.springframework.core.type.classreading.MetadataReader;
 import org.springframework.core.type.classreading.MetadataReaderFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.io.IOException;
@@ -149,29 +150,49 @@ public class PermissionManager implements ResourceLoaderAware {
 
                 String path1 = cam.url();
                 if (StringUtil.isEmpty(path1)) {
-                    path1 = path + path1;
-                } else {
                     RequestMapping arm = mt.getAnnotation(RequestMapping.class);
                     if (arm != null) {
                         String[] paths = arm.value();
-                        path1 = path + paths[0];
+                        path1 = paths[0];
+                    } else {
+                        GetMapping gm = mt.getAnnotation(GetMapping.class);
+                        if (gm != null) {
+                            String[] paths = gm.value();
+                            path1 = paths[0];
+                        } else {
+                            PostMapping pm = mt.getAnnotation(PostMapping.class);
+                            if (pm != null) {
+                                String[] paths = pm.value();
+                                path1 = paths[0];
+                            }
+                        }
                     }
                 }
 
-                ActionPO routeAction = new ActionPO();
-                routeAction.setId(mt.getName());
-                routeAction.setName(cam.label());
-                routeAction.setCode(mt.getName());
-                routeAction.setController(controller);
-                routeAction.setAuth(cam.auth());
-                routeAction.setPath(path1);
+                if (StringUtil.isNotEmpty(path1)) {
+                    ActionPO routeAction = new ActionPO();
 
-                routeController.addActionPO(mt.getName(), routeAction);
+                    // 检测是否存在 PathVariable
+                    int p = path1.indexOf("{");
+                    if (p > 0) {
+                        path1 = path1.substring(0, p);
+                        routeAction.setPrefix(true);
+                    } else if (p == 0) {
+                        // 如果无法确认路径则跳过
+                        continue;
+                    }
+
+                    routeAction.setId(mt.getName());
+                    routeAction.setName(cam.label());
+                    routeAction.setCode(mt.getName());
+                    routeAction.setController(controller);
+                    routeAction.setAuth(cam.auth());
+                    routeAction.setPath(path1);
+
+                    routeController.addActionPO(mt.getName(), routeAction);
+                }
             }
             controllers.put(controllerCode, routeController);
-//            for (String url : rm.path()) {
-//                urlmapping.put(url, routeController);
-//            }
         }
     }
 }

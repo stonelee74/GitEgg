@@ -5,8 +5,9 @@ public class ActionPO {
     private String name;
     private String code;
     private String auth;
-
     private String path;
+
+    private boolean prefix = false;
     private Class<Object> controller;
 
     public Class<Object> getController() {
@@ -55,6 +56,14 @@ public class ActionPO {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public boolean isPrefix() {
+        return prefix;
+    }
+
+    public void setPrefix(boolean prefix) {
+        this.prefix = prefix;
     }
 
     @Override

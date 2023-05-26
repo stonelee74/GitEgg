@@ -63,13 +63,14 @@ public class AutoRunner implements CommandLineRunner {
             HashMap<String, ActionPO> pos = v.getActionPOs();
             HashMap<String, Map> actions = new HashMap<>();
             for (Map.Entry<String, ActionPO> en1 : pos.entrySet()) {
-                HashMap<String, String> act = new HashMap<>();
+                HashMap<String, Object> act = new HashMap<>();
                 ActionPO po = en1.getValue();
                 act.put("id", po.getId());
                 act.put("name", po.getName());
                 act.put("code", po.getCode());
                 act.put("auth", po.getAuth());
                 act.put("path", po.getPath());
+                act.put("prefix", po.isPrefix());
                 actions.put(en1.getKey(), act);
             }
             m.put("actions", actions);
@@ -77,7 +78,12 @@ public class AutoRunner implements CommandLineRunner {
             controllerJson.set(en.getKey(), m);
         }
 
+        // 将权限数据保存到全局 Redis 中
         redisTemplate.opsForValue().set(RedisConstant.PERMISSION_KEY, controllerJson.toString());
+
+        // 重新加载权限数据
+        redisTemplate.opsForValue().set(RedisConstant.PERMISSION_RELOAD_KEY, true);
+
         MyStringUtils.printJson(controllerJson);
         System.out.println("=========== 保存完毕 ===========");
     }
