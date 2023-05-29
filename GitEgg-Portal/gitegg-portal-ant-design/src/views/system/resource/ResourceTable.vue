@@ -153,17 +153,19 @@
         <a-form-model-item label="是否缓存"
                            prop="resourceCache">
           <a-radio-group v-model="resourceForm.resourceCache"
-                         name="resourceCache">
-            <a-radio :value="true">是</a-radio>
-            <a-radio :value="false">否</a-radio>
+                         name="resourceCache"
+                         button-style="solid">
+            <a-radio-button :value="true">是</a-radio-button>
+            <a-radio-button :value="false">否</a-radio-button>
           </a-radio-group>
         </a-form-model-item>
         <a-form-model-item label="是否展示"
-                           prop="resourceShow"
-                           name="resourceShow">
-          <a-radio-group v-model="resourceForm.resourceShow">
-            <a-radio :value="true">是</a-radio>
-            <a-radio :value="false">否</a-radio>
+                           prop="resourceShow">
+          <a-radio-group v-model="resourceForm.resourceShow"
+                         name="resourceShow"
+                         button-style="solid">
+            <a-radio-button :value="true">是</a-radio-button>
+            <a-radio-button :value="false">否</a-radio-button>
           </a-radio-group>
         </a-form-model-item>
         <a-form-model-item label="备注信息">
@@ -323,22 +325,19 @@ export default {
           { required: true, message: '请选择资源类型', trigger: 'blur' }
         ],
         resourceIcon: [
-          { required: true, message: '请输入资源图标', trigger: 'blur' },
+          // { required: true, message: '请输入资源图标', trigger: 'blur' },
           { min: 2, max: 32, message: '长度在 2 到 32 个字符', trigger: 'blur' }
         ],
         resourcePath: [
-          { required: true, message: '请输入资源path', trigger: 'blur' },
+          // { required: true, message: '请输入资源path', trigger: 'blur' },
           { min: 2, max: 255, message: '长度在 2 到 255 个字符', trigger: 'blur' }
         ],
         resourceUrl: [
-          { required: true, message: '请输入资源接口', trigger: 'blur' },
+          // { required: true, message: '请输入资源接口', trigger: 'blur' },
           { min: 2, max: 255, message: '长度在 2 到 255 个字符', trigger: 'blur' }
         ],
         resourceLevel: [
           { required: true, message: '请输入资源排序', trigger: 'blur' }
-        ],
-        comments: [
-          { required: true, message: '请填写备注信息', trigger: 'blur' }
         ]
       },
       args: [null, null, null]

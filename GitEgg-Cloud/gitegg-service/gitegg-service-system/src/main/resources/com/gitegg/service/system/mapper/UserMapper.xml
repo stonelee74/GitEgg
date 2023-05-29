@@ -68,7 +68,7 @@
 <!--        LEFT JOIN t_sys_data_permission_user dataPermission ON su.id = dataPermission.user_id AND-->
 <!--        dataPermission.del_flag = 0-->
 <!--        INNER JOIN t_sys_organization_user AS sou ON su.id = sou.user_id AND-->
-<!--        organizationUser.del_flag = 0-->
+<!--        sou.del_flag = 0-->
 <!--        INNER JOIN t_sys_organization so ON sou.organization_id = so.id AND-->
 <!--        so.del_flag = 0-->
 <!--        WHERE su.del_flag = 0-->
@@ -175,13 +175,6 @@
             <if test="user.status != null">
                 AND su.status = #{user.status}
             </if>
-<!--            <if test="user.roleId != null and user.roleId != ''">-->
-<!--                &lt;!&ndash;这里需要这么写，否则多角色用户再通过角色查询时，只能查询出一个角色&ndash;&gt;-->
-<!--                AND su.id IN (-->
-<!--                SELECT userRole.user_id-->
-<!--                FROM t_sys_user_role userRole-->
-<!--                WHERE userRole.del_flag = 0 AND userRole.role_id = #{user.roleId})-->
-<!--            </if>-->
             <if test="user.organizationId != null and user.organizationId != ''">
                 AND so.id = #{user.organizationId}
             </if>
@@ -221,17 +214,10 @@
         su.operator AS operator,
         GROUP_CONCAT(DISTINCT sr.id) AS roleIds,
         GROUP_CONCAT(DISTINCT sr.role_key) AS roleKeys,
-        GROUP_CONCAT(DISTINCT sr.role_name) AS roleNames,
-        GROUP_CONCAT(DISTINCT sr.data_permission_type) AS dataPermissionTypes,
-        GROUP_CONCAT(DISTINCT dataPermission.organization_id) AS organizationIds,
-        so.id AS organizationId,
-        so.organization_name AS organizationName
+        GROUP_CONCAT(DISTINCT sr.role_name) AS roleNames
         FROM t_sys_user su
-        INNER JOIN t_sys_user_role userRole ON su.id = userRole.user_id AND userRole.del_flag = 0
-        LEFT JOIN t_sys_role sr ON userRole.role_id = sr.id AND sr.del_flag = 0
-        LEFT JOIN t_sys_data_permission_user dataPermission ON su.id = dataPermission.user_id AND dataPermission.del_flag = 0
-        INNER JOIN t_sys_organization_user organizationUser ON su.id = organizationUser.user_id AND organizationUser.del_flag = 0
-        INNER JOIN t_sys_organization so ON organizationUser.organization_id = so.id AND so.del_flag = 0
+        INNER JOIN t_sys_organization_user sou ON su.id = sou.user_id AND sou.del_flag = 0
+        LEFT JOIN t_sys_role sr ON sou.role_id = sr.id AND sr.del_flag = 0
         WHERE su.del_flag = 0
         <if test="user.id != null and user.id != ''">
             AND su.id = #{user.id}
@@ -310,9 +296,9 @@
         FROM t_sys_user su
         INNER JOIN t_sys_user_role userRole ON su.id = userRole.user_id AND userRole.del_flag = 0
         LEFT JOIN t_sys_role sr ON userRole.role_id = sr.id AND sr.del_flag = 0
-        INNER JOIN t_sys_organization_user organizationUser ON su.id = organizationUser.user_id AND
-        organizationUser.del_flag = 0
-        INNER JOIN t_sys_organization so ON organizationUser.organization_id = so.id AND
+        INNER JOIN t_sys_organization_user sou ON su.id = sou.user_id AND
+        sou.del_flag = 0
+        INNER JOIN t_sys_organization so ON sou.organization_id = so.id AND
         so.del_flag = 0
         WHERE su.del_flag = 0
         <trim prefix="AND (" suffix=")" prefixOverrides="AND">
@@ -370,6 +356,20 @@
         </trim>
         GROUP BY su.id
         ORDER BY su.create_time DESC
+    </select>
+
+    <select id="queryUserRoleInfo" resultType="com.gitegg.service.system.entity.OrganizationUser">
+        SELECT sou.organization_id AS organizationId,
+               so.name AS organizationName,
+               sou.role_id AS roleId,
+               sou.role_key AS roleKey,
+               sr.name AS roleName,
+               sou.user_id AS userId,
+               sou.is_primary AS isPrimary
+        FROM t_sys_organization_user sou
+        LEFT JOIN t_sys_role sr ON sou.role_id = sr.id AND sr.del_flag = 0
+        LEFT JOIN t_sys_organization so ON sou.organization_id = so.id AND so.del_flag = 0
+        WHERE sou.user_id = #{userId}
     </select>
 
 </mapper>

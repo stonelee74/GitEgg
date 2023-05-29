@@ -444,33 +444,52 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
             throw new BusinessException(ResultCodeEnum.INVALID_USERNAME.getMsg());
         }
 
-        String roleIds = userInfo.getRoleIds();
-        //组装角色ID列表，用于Oatuh2和Gateway鉴权
-        if (!StringUtils.isEmpty(roleIds)) {
-            String[] roleIdsArray = roleIds.split(StrUtil.COMMA);
-            userInfo.setRoleIdList(Arrays.asList(roleIdsArray));
+        // 取得用户组信息
+        List<OrganizationUser> ouList = userMapper.queryUserRoleInfo(user.getId());
+        List<String> roleIds = new ArrayList<>();
+        List<String> roleKeys = new ArrayList<>();
+        for(OrganizationUser u: ouList) {
+            roleIds.add(u.getRoleId().toString());
+            roleKeys.add(u.getRoleKey());
+
+            int isPrimary = u.getIsPrimary();
+            if (isPrimary > 0) {
+                // 取得主要岗位机构信息
+                userInfo.setOrganizationId(u.getOrganizationId());
+                userInfo.setOrganizationName(u.getOrganizationName());
+            }
         }
 
-        String roleKeys = userInfo.getRoleKeys();
-        //组装角色key列表，用于前端页面鉴权
-        if (!StringUtils.isEmpty(roleKeys)) {
-            String[] roleKeysArray = roleKeys.split(StrUtil.COMMA);
-            userInfo.setRoleKeyList(Arrays.asList(roleKeysArray));
-        }
+        userInfo.setRoleIdList(roleIds);
+        userInfo.setRoleKeyList(roleKeys);
 
-        String dataPermissionTypes = userInfo.getDataPermissionTypes();
-        // 获取用户的角色数据权限级别
-        if (!StringUtils.isEmpty(dataPermissionTypes)) {
-            String[] dataPermissionTypeArray = dataPermissionTypes.split(StrUtil.COMMA);
-            userInfo.setDataPermissionTypeList(Arrays.asList(dataPermissionTypeArray));
-        }
+//        String roleIds = userInfo.getRoleIds();
+//        //组装角色ID列表，用于Oatuh2和Gateway鉴权
+//        if (!StringUtils.isEmpty(roleIds)) {
+//            String[] roleIdsArray = roleIds.split(StrUtil.COMMA);
+//            userInfo.setRoleIdList(Arrays.asList(roleIdsArray));
+//        }
 
-        String organizationIds = userInfo.getOrganizationIds();
-        // 获取用户机构数据权限列表
-        if (!StringUtils.isEmpty(organizationIds)) {
-            String[] organizationIdArray = organizationIds.split(StrUtil.COMMA);
-            userInfo.setOrganizationIdList(Arrays.asList(organizationIdArray));
-        }
+//        String roleKeys = userInfo.getRoleKeys();
+//        //组装角色key列表，用于前端页面鉴权
+//        if (!StringUtils.isEmpty(roleKeys)) {
+//            String[] roleKeysArray = roleKeys.split(StrUtil.COMMA);
+//            userInfo.setRoleKeyList(Arrays.asList(roleKeysArray));
+//        }
+//
+//        String dataPermissionTypes = userInfo.getDataPermissionTypes();
+//        // 获取用户的角色数据权限级别
+//        if (!StringUtils.isEmpty(dataPermissionTypes)) {
+//            String[] dataPermissionTypeArray = dataPermissionTypes.split(StrUtil.COMMA);
+//            userInfo.setDataPermissionTypeList(Arrays.asList(dataPermissionTypeArray));
+//        }
+//
+//        String organizationIds = userInfo.getOrganizationIds();
+//        // 获取用户机构数据权限列表
+//        if (!StringUtils.isEmpty(organizationIds)) {
+//            String[] organizationIdArray = organizationIds.split(StrUtil.COMMA);
+//            userInfo.setOrganizationIdList(Arrays.asList(organizationIdArray));
+//        }
 
         QueryUserResourceDTO queryUserResourceDTO = new QueryUserResourceDTO();
         queryUserResourceDTO.setUserId(userInfo.getId());

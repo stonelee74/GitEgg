@@ -30,13 +30,29 @@ public class OrganizationUser extends BaseEntity {
     @TableField("organization_id")
     private Long organizationId;
 
+    @ApiModelProperty(value = "机构名称")
+    @TableField(exist = false)
+    private String organizationName;
+
     @ApiModelProperty(value = "角色id")
     @TableField("role_id")
     private Long roleId;
 
+    @ApiModelProperty(value = "角色名称")
+    @TableField(exist = false)
+    private String roleName;
+
+    @ApiModelProperty(value = "角色标识")
+    @TableField(exist = false)
+    private String roleKey;
+
     @ApiModelProperty(value = "用户id")
     @TableField("user_id")
     private Long userId;
+
+    @ApiModelProperty(value = "用户名称")
+    @TableField(exist = false)
+    private String userName;
 
     @ApiModelProperty("是否主岗（1:主岗 0:兼职）")
     @TableField("is_primary")

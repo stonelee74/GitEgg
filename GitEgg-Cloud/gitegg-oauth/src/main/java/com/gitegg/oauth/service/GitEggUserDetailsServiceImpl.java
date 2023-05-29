@@ -138,14 +138,18 @@ public class GitEggUserDetailsServiceImpl implements UserDetailsService {
              * AccountNonLocked  账户是否被锁  密码尝试次数过多，则锁定账户
              * CredentialsNonExpired 凭证是否过期
              */
-            return new GitEggUserDetails(gitEggUser.getId(), gitEggUser.getTenantId(), gitEggUser.getOauthId(),
-                gitEggUser.getNickname(), gitEggUser.getRealName(), gitEggUser.getOrganizationId(),
-                gitEggUser.getOrganizationName(),
-                    gitEggUser.getOrganizationIds(), gitEggUser.getOrganizationNames(), gitEggUser.getRoleId(), gitEggUser.getRoleIds(), gitEggUser.getRoleName(), gitEggUser.getRoleNames(),
-                gitEggUser.getRoleIdList(), gitEggUser.getRoleKeyList(), gitEggUser.getResourceKeyList(),
-                gitEggUser.getDataPermissionTypeList(), gitEggUser.getOrganizationIdList(),
-                gitEggUser.getAvatar(), gitEggUser.getAccount(), gitEggUser.getPassword(), !String.valueOf(GitEggConstant.DISABLE).equals(gitEggUser.getStatus()), true, true, true,
-                this.getPrivileges(gitEggUser.getRoleKeyList(), gitEggUser.getResourceUrlList()));
+            return new GitEggUserDetails(gitEggUser.getId(),
+                    gitEggUser.getTenantId(), gitEggUser.getOauthId(),
+                    gitEggUser.getNickname(), gitEggUser.getRealName(), gitEggUser.getOrganizationId(),
+                    gitEggUser.getOrganizationName(),
+                    gitEggUser.getOrganizationIds(), gitEggUser.getOrganizationNames(),
+                    gitEggUser.getRoleId(), gitEggUser.getRoleIds(), gitEggUser.getRoleName(), gitEggUser.getRoleNames(),
+                    gitEggUser.getRoleIdList(), gitEggUser.getRoleKeyList(), gitEggUser.getResourceKeyList(),
+                    gitEggUser.getDataPermissionTypeList(), gitEggUser.getOrganizationIdList(),
+                    gitEggUser.getAvatar(), gitEggUser.getAccount(), gitEggUser.getPassword(),
+                    !String.valueOf(GitEggConstant.DISABLE).equals(gitEggUser.getStatus()),
+                    true, true, true,
+                    this.getPrivileges(gitEggUser.getRoleKeyList(), gitEggUser.getResourceUrlList()));
         } else {
             throw new UsernameNotFoundException(result.getMsg());
         }
