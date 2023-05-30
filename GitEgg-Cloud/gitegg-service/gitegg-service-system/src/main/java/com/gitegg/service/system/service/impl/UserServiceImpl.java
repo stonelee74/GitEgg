@@ -445,7 +445,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         }
 
         // 取得用户组信息
-        List<OrganizationUser> ouList = userMapper.queryUserRoleInfo(user.getId());
+        List<OrganizationUser> ouList = userMapper.queryUserRoleInfo(userInfo.getId());
         List<String> roleIds = new ArrayList<>();
         List<String> roleKeys = new ArrayList<>();
         for(OrganizationUser u: ouList) {

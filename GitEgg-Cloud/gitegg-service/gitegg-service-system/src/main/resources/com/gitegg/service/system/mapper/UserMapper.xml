@@ -360,10 +360,10 @@
 
     <select id="queryUserRoleInfo" resultType="com.gitegg.service.system.entity.OrganizationUser">
         SELECT sou.organization_id AS organizationId,
-               so.name AS organizationName,
+               so.organization_name AS organizationName,
                sou.role_id AS roleId,
-               sou.role_key AS roleKey,
-               sr.name AS roleName,
+               sr.role_key AS roleKey,
+               sr.role_name AS roleName,
                sou.user_id AS userId,
                sou.is_primary AS isPrimary
         FROM t_sys_organization_user sou

@@ -151,18 +151,23 @@ public class GitEggOAuthController {
             }
         }
 
-        OAuth2AccessToken oAuth2AccessToken = tokenEndpoint.postAccessToken(principal, parameters).getBody();
-        DefaultExpiringOAuth2RefreshToken refreshToken = (DefaultExpiringOAuth2RefreshToken)oAuth2AccessToken.getRefreshToken();
-        Oauth2Token oauth2Token = Oauth2Token.builder()
-                .token(oAuth2AccessToken.getValue())
-                .expiresIn(oAuth2AccessToken.getExpiresIn())
-                .exp(oAuth2AccessToken.getExpiration().getTime() / GitEggConstant.Number.THOUSAND)
-                .refreshToken(refreshToken.getValue())
-                .refreshExpiresIn((int) (refreshToken.getExpiration().getTime() / GitEggConstant.Number.THOUSAND - System.currentTimeMillis() / GitEggConstant.Number.THOUSAND))
-                .refreshExp(refreshToken.getExpiration().getTime() / GitEggConstant.Number.THOUSAND)
-                .tokenHead(AuthConstant.JWT_TOKEN_PREFIX)
-                .build();
-        return Result.data(oauth2Token);
+        try {
+            OAuth2AccessToken oAuth2AccessToken = tokenEndpoint.postAccessToken(principal, parameters).getBody();
+            DefaultExpiringOAuth2RefreshToken refreshToken = (DefaultExpiringOAuth2RefreshToken) oAuth2AccessToken.getRefreshToken();
+            Oauth2Token oauth2Token = Oauth2Token.builder()
+                    .token(oAuth2AccessToken.getValue())
+                    .expiresIn(oAuth2AccessToken.getExpiresIn())
+                    .exp(oAuth2AccessToken.getExpiration().getTime() / GitEggConstant.Number.THOUSAND)
+                    .refreshToken(refreshToken.getValue())
+                    .refreshExpiresIn((int) (refreshToken.getExpiration().getTime() / GitEggConstant.Number.THOUSAND - System.currentTimeMillis() / GitEggConstant.Number.THOUSAND))
+                    .refreshExp(refreshToken.getExpiration().getTime() / GitEggConstant.Number.THOUSAND)
+                    .tokenHead(AuthConstant.JWT_TOKEN_PREFIX)
+                    .build();
+            return Result.data(oauth2Token);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Result.data("");
+        }
     }
 
     @ApiOperation("发送短信验证码")
