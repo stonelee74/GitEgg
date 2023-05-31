@@ -23,6 +23,7 @@ import com.gitegg.service.system.dto.UpdateUserDTO;
 import com.gitegg.service.system.entity.User;
 import com.gitegg.service.system.entity.UserInfo;
 import com.gitegg.service.system.service.IDataPermissionUserService;
+import com.gitegg.service.system.service.IOrganizationUserService;
 import com.gitegg.service.system.service.IUserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -63,6 +64,8 @@ import java.util.List;
 public class UserController {
 
     private final IUserService userService;
+
+    private final IOrganizationUserService organizationUserService;
 
     private final IDataPermissionUserService dataPermissionUserService;
 
@@ -134,14 +137,31 @@ public class UserController {
     /**
      * 删除用户
      */
-    @PostMapping("/delete/{userId}")
+    @PostMapping("/deleteRole/{userId}")
     @ApiOperation(value = "删除用户")
     @ApiImplicitParam(paramType = "path", name = "userId", value = "用户ID", required = true, dataTypeClass = Long.class)
     @WebPermission(label = "删除用户", auth = "删除")
-    public Result<?> delete(@PathVariable("userId") Long userId) {
+    public Result<?> deleteRole(@PathVariable("userId") Long userId) {
         if (null == userId) {
             return Result.error("用户ID不能为空");
         }
+
+        boolean result = organizationUserService.removeById(userId);
+        return Result.result(result);
+    }
+
+    /**
+     * 删除用户
+     */
+    @PostMapping("/deleteUser/{userId}")
+    @ApiOperation(value = "删除用户")
+    @ApiImplicitParam(paramType = "path", name = "userId", value = "用户ID", required = true, dataTypeClass = Long.class)
+    @WebPermission(label = "删除用户", auth = "删除")
+    public Result<?> deleteUser(@PathVariable("userId") Long userId) {
+        if (null == userId) {
+            return Result.error("用户ID不能为空");
+        }
+
         boolean result = userService.deleteUser(userId);
         return Result.result(result);
     }
@@ -157,7 +177,7 @@ public class UserController {
         if (CollectionUtils.isEmpty(userIds)) {
             return Result.error("用户ID列表不能为空");
         }
-        boolean result = userService.batchDeleteUser(userIds);
+        boolean result = organizationUserService.removeByIds(userIds);
         return Result.result(result);
     }
 

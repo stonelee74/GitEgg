@@ -133,7 +133,7 @@ public class GitEggOAuthController {
     @PostMapping("/token")
     public Result postAccessToken( @ApiIgnore Principal principal, @ApiIgnore @RequestParam Map<String, String> parameters) throws HttpRequestMethodNotSupportedException {
 
-        //先对密码进行处理，取account和md5加密密码
+        // 先对密码进行处理，取account和md5加密密码
         String username = parameters.get("username");
         String password = parameters.get("password");
         if (!StringUtils.isEmpty(username) && !StringUtils.isEmpty(password))

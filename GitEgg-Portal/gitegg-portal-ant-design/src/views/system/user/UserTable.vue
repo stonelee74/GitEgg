@@ -201,7 +201,11 @@
                   </a-menu-item>
                   <a-menu-item v-hasAnyPerms="['system:user:delete', 'system:user:batch:delete']">
                     <a href="javascript:;"
-                       @click="handleDelete(record)">删除</a>
+                       @click="handleDeleteRole(record)">删除岗位</a>
+                  </a-menu-item>
+                  <a-menu-item v-hasAnyPerms="['system:user:delete', 'system:user:batch:delete']">
+                    <a href="javascript:;"
+                       @click="handleDeleteUser(record)">删除用户</a>
                   </a-menu-item>
                 </a-menu>
               </a-dropdown>
@@ -428,7 +432,7 @@
 
 <script>
 import { STable, OrganizationTreeSelect } from '@/components'
-import { fetchList, simpleList, createUser, resetUserPassword, deleteUser, batchDeleteUser, updateUser, updateUserStatus, fetchRoleList, updateUserDataPermission, checkUserExist } from '@/api/system/user'
+import { fetchList, simpleList, createUser, resetUserPassword, deleteUser, deleteRole, batchDeleteUser, updateUser, updateUserStatus, fetchRoleList, updateUserDataPermission, checkUserExist } from '@/api/system/user'
 import { fetchOrgList } from '@/api/system/organization'
 import moment from 'moment'
 import Data from '@/api/pcaa'
@@ -1093,10 +1097,28 @@ export default {
         }
       })
     },
-    handleDelete (row) {
+    handleDeleteRole (row) {
       var that = this
       this.$confirm({
-        title: '此操作将永久删除该用户：' + row.account + ', 是否继续?',
+        title: '删除该用户的任职岗位信息：' + row.realName + ', 是否继续?',
+        content: '',
+        onOk () {
+          that.listLoading = true
+          deleteRole(row.organizationUserId).then(() => {
+            that.listLoading = false
+            that.$message.success('删除成功!')
+            this.handleTableRefresh()
+          })
+        },
+        onCancel () {
+          that.$message.info('已取消删除')
+        }
+      })
+    },
+    handleDeleteUser (row) {
+      var that = this
+      this.$confirm({
+        title: '永久删除该用户的所有相关信息：' + row.realName + ', 是否继续?',
         content: '',
         onOk () {
           that.listLoading = true

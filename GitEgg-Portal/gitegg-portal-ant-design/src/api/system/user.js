@@ -1,8 +1,9 @@
 import request from '@/utils/request'
+import defaultSettings from '@/config/defaultSettings'
 
 export function simpleList (query) {
   return request({
-    url: '/gitegg-service-system/user/simpleList',
+    url: `${defaultSettings.service_system_url}user/simpleList`,
     method: 'get',
     params: query
   })
@@ -10,7 +11,7 @@ export function simpleList (query) {
 
 export function fetchList (query) {
   return request({
-    url: '/gitegg-service-system/user/list',
+    url: `${defaultSettings.service_system_url}user/list`,
     method: 'get',
     params: query
   })
@@ -18,7 +19,7 @@ export function fetchList (query) {
 
 export function createUser (data) {
   return request({
-    url: '/gitegg-service-system/user/create',
+    url: `${defaultSettings.service_system_url}user/create`,
     method: 'post',
     data
   })
@@ -26,7 +27,7 @@ export function createUser (data) {
 
 export function updateUser (data) {
   return request({
-    url: '/gitegg-service-system/user/update',
+    url: `${defaultSettings.service_system_url}user/update`,
     method: 'post',
     data
   })
@@ -34,7 +35,7 @@ export function updateUser (data) {
 
 export function updateUserInfo (data) {
   return request({
-    url: '/gitegg-service-system/user/update/info',
+    url: `${defaultSettings.service_system_url}user/update/info`,
     method: 'post',
     data
   })
@@ -42,7 +43,7 @@ export function updateUserInfo (data) {
 
 export function queryUserInfo (data) {
   return request({
-    url: '/gitegg-service-system/auth/user/info',
+    url: `${defaultSettings.service_system_url}auth/user/info`,
     method: 'get',
     data
   })
@@ -50,7 +51,7 @@ export function queryUserInfo (data) {
 
 export function updatePwd (data) {
   return request({
-    url: '/gitegg-service-system/user/password/change',
+    url: `${defaultSettings.service_system_url}user/password/change`,
     method: 'post',
     data
   })
@@ -58,28 +59,35 @@ export function updatePwd (data) {
 
 export function resetUserPassword (id) {
   return request({
-    url: '/gitegg-service-system/user/password/reset/' + id,
+    url: `${defaultSettings.service_system_url}user/password/reset/${id}`,
     method: 'post'
   })
 }
 
 export function updateUserStatus (userId, status) {
   return request({
-    url: '/gitegg-service-system/user/status/' + userId + '/' + status,
+    url: `${defaultSettings.service_system_url}user/status/${userId}/${status}`,
+    method: 'post'
+  })
+}
+
+export function deleteRole (id) {
+  return request({
+    url: `${defaultSettings.service_system_url}user/deleteRole/${id}`,
     method: 'post'
   })
 }
 
 export function deleteUser (id) {
   return request({
-    url: '/gitegg-service-system/user/delete/' + id,
+    url: `${defaultSettings.service_system_url}user/deleteUser/${id}`,
     method: 'post'
   })
 }
 
 export function batchDeleteUser (data) {
   return request({
-    url: '/gitegg-service-system/user/batch/delete',
+    url: `${defaultSettings.service_system_url}user/batch/delete`,
     method: 'post',
     data
   })
@@ -87,7 +95,7 @@ export function batchDeleteUser (data) {
 
 export function fetchRoleList (data) {
   return request({
-    url: '/gitegg-service-system/role/all',
+    url: `${defaultSettings.service_system_url}role/all`,
     method: 'get',
     data
   })
@@ -95,7 +103,7 @@ export function fetchRoleList (data) {
 
 export function updateUserDataPermission (data) {
   return request({
-    url: '/gitegg-service-system/user/update/organization/data/permission',
+    url: `${defaultSettings.service_system_url}user/update/organization/data/permission`,
     method: 'post',
     data
   })
@@ -103,7 +111,7 @@ export function updateUserDataPermission (data) {
 
 export function checkUserExist (data) {
   return request({
-    url: '/gitegg-service-system/user/check',
+    url: `${defaultSettings.service_system_url}user/check`,
     method: 'post',
     data
   })
@@ -111,7 +119,7 @@ export function checkUserExist (data) {
 
 export function fetchOrganizationDataList (query) {
   return request({
-    url: '/gitegg-service-system/user/organization/data/permission/list',
+    url: `${defaultSettings.service_system_url}user/organization/data/permission/list`,
     method: 'get',
     params: query
   })
@@ -119,7 +127,7 @@ export function fetchOrganizationDataList (query) {
 
 export function batchDeleteOrganizationData (data) {
   return request({
-    url: '/gitegg-service-system/user/organization/data/permission/batch/delete',
+    url: `${defaultSettings.service_system_url}user/organization/data/permission/batch/delete`,
     method: 'post',
     data
   })

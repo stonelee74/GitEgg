@@ -23,10 +23,8 @@ public class InitSystemCacheRunner implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
-
-        log.info("InitResourceRolesCacheRunner running");
-
         // 初始化系统权限和角色的关系缓存
+        log.info("初始化系统权限和角色的关系缓存");
         roleResourceService.initResourceRoles();
 
         // 初始化数据权限缓存

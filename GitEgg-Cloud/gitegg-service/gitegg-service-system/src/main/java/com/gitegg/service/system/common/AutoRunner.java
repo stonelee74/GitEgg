@@ -7,6 +7,7 @@ import com.gitegg.platform.base.permission.ActionPO;
 import com.gitegg.platform.base.permission.ControllerPO;
 import com.gitegg.platform.base.util.MyObjectUtil;
 import com.gitegg.platform.base.util.MyStringUtils;
+import jodd.util.StringUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -52,11 +53,14 @@ public class AutoRunner implements CommandLineRunner {
             System.out.println("更新控制器：" + en.getKey());
 
             ControllerPO v = en.getValue();
+            String auth = v.getAuth();
+            if (StringUtil.isEmpty(auth)) continue;
+
             Map<String, Object> m = new HashMap<>();
             m.put("id", v.getId());
             m.put("name", v.getName());
             m.put("code", v.getCode());
-            m.put("auth", v.getAuth());
+            m.put("auth", auth);
             m.put("path", v.getPath());
             m.put("sys", SYS_CODE);
 
@@ -65,10 +69,13 @@ public class AutoRunner implements CommandLineRunner {
             for (Map.Entry<String, ActionPO> en1 : pos.entrySet()) {
                 HashMap<String, Object> act = new HashMap<>();
                 ActionPO po = en1.getValue();
+                auth = po.getAuth();
+                if (StringUtil.isEmpty(auth)) continue;
+
                 act.put("id", po.getId());
                 act.put("name", po.getName());
                 act.put("code", po.getCode());
-                act.put("auth", po.getAuth());
+                act.put("auth", auth);
                 act.put("path", po.getPath());
                 act.put("prefix", po.isPrefix());
                 actions.put(en1.getKey(), act);

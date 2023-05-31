@@ -27,5 +27,6 @@ export default {
   title: 'GitEgg Cloud',
   pwa: false,
   iconfontUrl: '',
-  production: process.env.NODE_ENV === 'production' && process.env.VUE_APP_PREVIEW !== 'true'
+  production: process.env.NODE_ENV === 'production' && process.env.VUE_APP_PREVIEW !== 'true',
+  service_system_url: '/gitegg-service-system/'
 }
