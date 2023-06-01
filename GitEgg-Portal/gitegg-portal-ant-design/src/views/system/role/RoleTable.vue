@@ -821,11 +821,69 @@ export default {
         autoExpandParent: true
       })
     },
-    computeRoleResources (item, e) {
-      this.checkedKeys = item.checked
-      var halfCheckedKeys = item.halfChecked
-      if (halfCheckedKeys) {
-        this.checkedKeys = this.checkedKeys.concat(halfCheckedKeys)
+    computeRoleResources (data, e) {
+      var keys = data.checked.concat(data.halfChecked)
+
+      // 取得所有上级节点
+      function getParent (id, tree) {
+        var list = [id]
+        function backarr (childId, arr) {
+          arr.forEach((item) => {
+            if (item.id === childId) {
+              if (item['parentId'] !== 0) {
+                list.unshift(item['parentId'])
+                backarr(item['parentId'], tree)
+              }
+            } else if (item['children'] && item['children'].length > 0) {
+              backarr(childId, item['children'])
+            }
+          })
+          return list
+        }
+        return backarr(id, tree)
+      }
+      // 取得所有下级节点
+      function getChildren (ids, list) {
+        var child = []
+        // 查找指定id下所有子元素集合
+        function nextChild (arr) {
+          arr.forEach((item) => {
+            if (item.children && item.children.length > 0) {
+              child.push(...item.children.map((a) => a.id))
+              nextChild(item.children)
+            }
+          })
+        }
+        // 找到指定id
+        function findChild (ids, arr) {
+          for (var item of arr) {
+            if (item.id === ids) {
+              if (item.children && item.children.length > 0) {
+                child.push(...item.children.map((a) => a.id))
+                nextChild(item.children)
+                break
+              }
+            } else if (item.children && item.children.length > 0) {
+              findChild(ids, item.children)
+            }
+          }
+          return child
+        }
+        return findChild(ids, list)
+      }
+
+      var children = getChildren(e.node.eventKey, this.resourceTreeData)
+      if (e.checked) {        
+        var parent = getParent(e.node.eventKey, this.resourceTreeData)
+        keys.push(...parent)
+        keys.push(...children)
+        this.checkedKeys = [...new Set(keys)]
+        data.checked = this.checkedKeys
+      } else {
+        this.checkedKeys = keys.filter(
+          (x) => !children.some((item) => x === item)
+        )
+        data.checked = this.checkedKeys
       }
     }
   }
