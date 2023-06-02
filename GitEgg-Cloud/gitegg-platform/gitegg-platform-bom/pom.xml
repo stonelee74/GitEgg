@@ -98,11 +98,14 @@
         <!-- prometheus 微服务监控 和 spring-boot-admin二选一-->
         <micrometer.registry.prometheus.version>1.5.14</micrometer.registry.prometheus.version>
         <!-- Spring Cloud Alibaba -->
-        <spring.cloud.alibaba>2.2.8.RELEASE</spring.cloud.alibaba>
+        <!-- 2.2.8.RELEASE -->
+        <spring.cloud.alibaba>2021.0.5.0</spring.cloud.alibaba>
         <!-- SpringBoot版本号 -->
-        <spring.boot.version>2.3.12.RELEASE</spring.boot.version>
+        <!-- 2.3.12.RELEASE -->
+        <spring.boot.version>2.7.12</spring.boot.version>
         <!-- SpringCloud版本号 -->
-        <spring.cloud.version>Hoxton.SR12</spring.cloud.version>
+        <!-- Hoxton.SR12 -->
+        <spring.cloud.version>2021.0.7</spring.cloud.version>
     </properties>
 
     <dependencyManagement>
